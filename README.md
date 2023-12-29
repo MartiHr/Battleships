@@ -1,2 +1,2 @@
 # Battleships
- Semester project for the "Faculty of mathematics and informatics"
+ Semester project for the "Faculty of mathematics and informatics".
