@@ -75,6 +75,8 @@ void initializeMatrix(char** matrix, int size) {
 
 	for (int i = 0; i < size; i++)
 	{
+		matrix[i] = new char[size];
+
 		for (int j = 0; j < size; j++)
 		{
 			matrix[i][j] = '~';
