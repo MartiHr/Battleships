@@ -37,10 +37,25 @@ int readSizeOfMatrix() {
 	return size;
 }
 
+void initializeMatrix(char** matrix, int size) {
+	if (!matrix) {
+		return;
+	}
+
+	for (int i = 0; i < size; i++)
+	{
+		for (int j = 0; j < size; j++)
+		{
+			matrix[i][j] = '~';
+		}
+	}
+}
 
 int main()
 {
 	showLoadingScreen();
 	showEnterSizeMessage();
 	int size = readSizeOfMatrix();
+
+	char** matrix = new char* [size];
 }
