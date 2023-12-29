@@ -37,6 +37,21 @@ int readSizeOfMatrix() {
 	return size;
 }
 
+void printMatrix(char** matrix, int size) {
+	if (!matrix)
+	{
+		return;
+	}
+
+	for (int i = 0; i < size; i++) {
+		for (int j = 0; j < size; j++) {
+			cout << matrix[i][j];
+		}
+
+		cout << endl;
+	}
+}
+
 void initializeMatrix(char** matrix, int size) {
 	if (!matrix) {
 		return;
@@ -58,4 +73,6 @@ int main()
 	int size = readSizeOfMatrix();
 
 	char** matrix = new char* [size];
+	initializeMatrix(matrix, size);
+	printMatrix(matrix, size);
 }
