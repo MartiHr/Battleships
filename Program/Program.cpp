@@ -27,13 +27,8 @@ void showLoadingScreen() {
 
 }
 
-void showEnterSizeMessage() {
-	cout << "Please enter the size of the game field: " << endl;
-}
-
 void promptUserToStartGame() {
-	cout << "Press ENTER to start a game:";
-	cin.get();
+	cout << "Please enter the size of the game field and press ENTER to start: ";
 }
 
 void showGameStartMessage() {
@@ -93,12 +88,12 @@ int main()
 	
 	// For better UX 
 	promptUserToStartGame();
-	showEnterSizeMessage();
-	showGameStartMessage();
-
+	
 	int size = readSizeOfMatrix();
+	showGameStartMessage();
 
 	char** matrix = new char* [size];
 	initializeMatrix(matrix, size);
+
 	printMatrix(matrix, size);
 }
