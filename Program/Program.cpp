@@ -31,6 +31,13 @@ void showEnterSizeMessage() {
 	cout << "" << endl;
 }
 
+void promptUserToStartGame() {
+	cout << "Press enter to start a game:";
+	cin.get();
+	cout << "Game started!" << endl;
+}
+
+
 int readSizeOfMatrix() {
 	int size = 0;
 	cin >> size;
@@ -69,6 +76,7 @@ void initializeMatrix(char** matrix, int size) {
 int main()
 {
 	showLoadingScreen();
+	promptUserToStartGame();
 	showEnterSizeMessage();
 	int size = readSizeOfMatrix();
 
