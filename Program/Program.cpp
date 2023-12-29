@@ -35,12 +35,12 @@ void showGameStartMessage() {
 	cout << "Game started!" << endl;
 }
 
-void freeMemoryMatrix(int** matrix, int rows) {
+void freeMemoryMatrix(char** matrix, int size) {
 	if (!matrix) {
 		return;
 	}
 
-	for (int i = 0; i < rows; ++i) {
+	for (int i = 0; i < size; ++i) {
 		delete[] matrix[i];
 	}
 
@@ -98,4 +98,5 @@ int main()
 	initializeMatrix(matrix, size);
 
 	printMatrix(matrix, size);
+	freeMemoryMatrix(matrix, size);
 }

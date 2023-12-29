@@ -39,3 +39,6 @@ ipch/
 *.exe
 *.out
 *.app
+*.vsidx
+.vs/Battleships/v17/.suo
+.vs/Battleships/v17/.suo
