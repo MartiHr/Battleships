@@ -31,9 +31,16 @@ void showEnterSizeMessage() {
 	cout << "" << endl;
 }
 
+int readSizeOfMatrix() {
+	int size = 0;
+	cin >> size;
+	return size;
+}
+
+
 int main()
 {
 	showLoadingScreen();
 	showEnterSizeMessage();
-	
+	int size = readSizeOfMatrix();
 }
