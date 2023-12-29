@@ -37,6 +37,17 @@ void promptUserToStartGame() {
 	cout << "Game started!" << endl;
 }
 
+void freeMemoryMatrix(int** matrix, int rows) {
+	if (!matrix) {
+		return;
+	}
+
+	for (int i = 0; i < rows; ++i) {
+		delete[] matrix[i];
+	}
+
+	delete[] matrix;
+}
 
 int readSizeOfMatrix() {
 	int size = 0;
