@@ -27,6 +27,10 @@ void showLoadingScreen() {
 
 }
 
+void printWrongInputMessage() {
+	cout << "" << endl;
+}
+
 void promptUserToStartGame() {
 	cout << "Please enter the size of the game field and press ENTER to start: ";
 }
@@ -99,4 +103,5 @@ int main()
 
 	printMatrix(matrix, size);
 	freeMemoryMatrix(matrix, size);
+
 }
