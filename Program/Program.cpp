@@ -127,7 +127,7 @@ void printBattlefiedlsSideBySide(char** leftMatrix, char** rightMatrix, int size
 	}
 }
 
-void placeAUnit(char** matrix, int size, int x, int y, ShipType unitType) {
+void placeUnit(char** matrix, int size, int x, int y, ShipType unitType) {
 	if (!matrix) {
 		return;
 	}
@@ -135,22 +135,68 @@ void placeAUnit(char** matrix, int size, int x, int y, ShipType unitType) {
 
 void showPlaceUnitsMessage(int boatsCount, int submarinesCount, int destroyersCount, int carriersCount) {
 	cout << placeUnitsMeesage << boatsCount << " boats, "
-		<< submarinesCount <<  " submarines, " 
+		<< submarinesCount << " submarines, "
 		<< destroyersCount << " destroyers, "
 		<< carriersCount << "and carriers."
 		<< endl;
 }
 
-void placeUnits(char** matrix, int size, int boatsCount, int submarinesCount, int destroyersCount, int carriersCount) {
+void placeUnits(char** matrix, int size) {
 	if (!matrix) {
 		return;
 	}
 
-	showPlaceUnitsMessage(boatsCount, submarinesCount,  destroyersCount, carriersCount);
+	int boatsCount = 1;
+	int submarinesCount = 1;
+	int destroyersCount = 1;
+	int carriersCount = 1;
 
-	while (boatsCount != 0 && submarinesCount  && destroyersCount != 0 && carriersCount != 0)
-	{
+	showPlaceUnitsMessage(boatsCount, submarinesCount, destroyersCount, carriersCount);
 
+	while (boatsCount != 0 && submarinesCount && destroyersCount != 0 && carriersCount != 0) {
+		cout << "Enter type of unit : ";
+		char unitType = ' ';
+		cin >> unitType;
+
+		cout << "Enter x coordinate : ";
+		int x = 0;
+		cin >> x;
+
+		cout << "Enter y coordinate: ";
+		int y = 0;
+		cin >> y;
+
+		switch (unitType) {
+		case boatChar:
+			placeUnit(matrix, size, x, y, ShipType::Boat);
+			boatsCount--;
+			break;
+		case submarineChar:
+			placeUnit(matrix, size, x, y, ShipType::Submarine);
+			submarinesCount--;
+			break;
+		case destroyerChar:
+			placeUnit(matrix, size, x, y, ShipType::Destroyer);
+			destroyersCount--;
+			break;
+		case carrierChar:
+			placeUnit(matrix, size, x, y, ShipType::Carrier);
+			carriersCount--;
+			break;
+		default:
+			break;
+		}
+	}
+}
+
+void startGame(char** firstPlayerMatrix, char** secondPlayerMatrix, int size) {
+	bool isGameFinished = false;
+	bool firstPlayerTurn = true;
+
+	while (!isGameFinished) {
+		printBattlefiedlsSideBySide(firstPlayerMatrix, secondPlayerMatrix, size);
+		placeUnits(firstPlayerMatrix, size);
+		placeUnits(secondPlayerMatrix, size);
 	}
 }
 
@@ -169,14 +215,8 @@ int main()
 	initializeMatrix(firstPlayerMatrix, size);
 	initializeMatrix(secondPlayerMatrix, size);
 
-	bool isGameFinished = false;
-	bool firstPlayerTurn = true;
-	while (!isGameFinished)
-	{
-		printBattlefiedlsSideBySide(firstPlayerMatrix, secondPlayerMatrix, size);
-		placeUnits(firstPlayerMatrix, size);
-		placeUnits(secondPlayerMatrix, size);
-	}
+	// Start the game
+	startGame(firstPlayerMatrix, secondPlayerMatrix, size);
 
 	freeMemoryMatrix(firstPlayerMatrix, size);
 	freeMemoryMatrix(secondPlayerMatrix, size);
