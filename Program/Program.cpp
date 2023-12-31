@@ -9,6 +9,14 @@ enum ShipType {
 	Carrier = 5
 };
 
+const char placeUnitsMeesage[] = "The current player should place their units.";
+
+const char waterChar = '~';
+const char boatChar = 'b';
+const char submarineChar = 's';
+const char destroyerChar = 'd';
+const char carrierChar = 'c';
+
 void showLoadingScreen() {
 	cout << "                                     # #  ( )" << endl;
 	cout << "                                  ___#_#___|__" << endl;
@@ -90,7 +98,7 @@ void initializeMatrix(char** matrix, int size) {
 
 		for (int j = 0; j < size; j++)
 		{
-			matrix[i][j] = '~';
+			matrix[i][j] = waterChar;
 		}
 	}
 }
@@ -119,8 +127,22 @@ void printBattlefiedlsSideBySide(char** leftMatrix, char** rightMatrix, int size
 	}
 }
 
-void placeAUnit() {
+void placeAUnit(char** matrix, int size, int x, int y, ShipType unitType) {
+	if (!matrix) {
+		return;
+	}
+}
 
+void showPlaceUnitsMessage() {
+	cout << placeUnitsMeesage << endl;
+}
+
+void placeUnits(char** matrix, int size) {
+	if (!matrix) {
+		return;
+	}
+
+	showPlaceUnitMessage();
 }
 
 int main()
@@ -138,9 +160,16 @@ int main()
 	initializeMatrix(firstPlayerMatrix, size);
 	initializeMatrix(secondPlayerMatrix, size);
 
-	printBattlefiedlsSideBySide(firstPlayerMatrix, secondPlayerMatrix, size);
+	bool isGameFinished = false;
+	bool firstPlayerTurn = true;
+	while (!isGameFinished)
+	{
+		
+		printBattlefiedlsSideBySide(firstPlayerMatrix, secondPlayerMatrix, size);
+		placeUnits(firstPlayerMatrix, size);
+		placeUnits(secondPlayerMatrix, size);
+	}
 
 	freeMemoryMatrix(firstPlayerMatrix, size);
 	freeMemoryMatrix(secondPlayerMatrix, size);
-	
 }

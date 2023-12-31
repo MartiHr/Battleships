@@ -50,3 +50,5 @@ ipch/
 *.ilk
 *.pdb
 *.ilk
+*.db-wal
+.vs/Battleships/v17/.suo
