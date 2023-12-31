@@ -3,6 +3,7 @@
 using namespace std;
 
 enum ShipType {
+	Destroyed = 0,
 	Boat = 2,
 	Submarine = 3,
 	Destroyer = 4,
@@ -16,6 +17,7 @@ const char boatChar = 'b';
 const char submarineChar = 's';
 const char destroyerChar = 'd';
 const char carrierChar = 'c';
+const char destroyedChar = 'c';
 
 void showLoadingScreen() {
 	cout << "                                     # #  ( )" << endl;
@@ -47,7 +49,7 @@ void printWrongInputMessage() {
 }
 
 void promptUserToStartGame() {
-	cout << "Please enter the size for both game fields and press ENTER to start: ";
+	cout << "Please enter the size for the game fields and press ENTER to start: ";
 }
 
 void showGameStartMessage() {
@@ -115,7 +117,8 @@ void printBattlefiedlsSideBySide(char** leftMatrix, char** rightMatrix, int size
 		{
 			cout << leftMatrix[i][j];
 		}
-
+		
+		// Print a tabular
 		cout << '\t';
 
 		for (int j = 0; j < size; j++)
@@ -127,9 +130,36 @@ void printBattlefiedlsSideBySide(char** leftMatrix, char** rightMatrix, int size
 	}
 }
 
-void placeUnit(char** matrix, int size, int x, int y, ShipType unitType) {
+bool checkCoordinateIsInside(int coordinate, int size) {
+	return (coordinate >= 0 && coordinate < size);
+}
+
+// return a boolean and validate coordinates inside
+bool placeUnit(char** matrix, int size, int firstX, int firstY, int secondX, int secondY, ShipType unitType) {
 	if (!matrix) {
 		return;
+	}
+
+	if (checkCoordinatesInsideBoard(firstX, firstY, secondX, secondY))
+	{
+
+	}
+
+	switch (unitType)
+	{
+	case Boat:
+		matrix[firstX][firstY] = boatChar;
+		break;
+	case Submarine:
+		break;
+	case Destroyer:
+		break;
+	case Carrier:
+		break;
+	case Destroyed:
+		break;
+	default:
+		break;
 	}
 }
 
@@ -137,7 +167,7 @@ void showPlaceUnitsMessage(int boatsCount, int submarinesCount, int destroyersCo
 	cout << placeUnitsMeesage << boatsCount << " boats, "
 		<< submarinesCount << " submarines, "
 		<< destroyersCount << " destroyers, "
-		<< carriersCount << "and carriers."
+		<< "and " << carriersCount << " carriers."
 		<< endl;
 }
 
@@ -151,36 +181,62 @@ void placeUnits(char** matrix, int size) {
 	int destroyersCount = 1;
 	int carriersCount = 1;
 
-	showPlaceUnitsMessage(boatsCount, submarinesCount, destroyersCount, carriersCount);
-
 	while (boatsCount != 0 && submarinesCount && destroyersCount != 0 && carriersCount != 0) {
+		showPlaceUnitsMessage(boatsCount, submarinesCount, destroyersCount, carriersCount);
+
 		cout << "Enter type of unit : ";
 		char unitType = ' ';
 		cin >> unitType;
 
-		cout << "Enter x coordinate : ";
-		int x = 0;
-		cin >> x;
+		int firstX = -1;
+		cout << "Enter first x coordinate : ";
+		cin >> firstX;
+		while (!checkCoordinateIsInside(firstX, size)) {
+			cout << "Coordinate outside of board, enter first x coordinate again : " << endl;
+			cin >> firstX;
+		}
 
-		cout << "Enter y coordinate: ";
-		int y = 0;
-		cin >> y;
+		cout << "Enter first y coordinate: ";
+		int firstY = -1;
+		cin >> firstY;
+		while (!checkCoordinateIsInside(firstY, size)) {
+			cout << "Coordinate outside of board, enter first x coordinate again : " << endl;
+			cin >> firstY;
+		}
+
+		cout << "Enter second x coordinate : ";
+		int secondX = -1;
+		cin >> secondX;
+
+		cout << "Enter second y coordinate: ";
+		int secondY = -1;
+		cin >> secondY;
 
 		switch (unitType) {
 		case boatChar:
-			placeUnit(matrix, size, x, y, ShipType::Boat);
-			boatsCount--;
+			if (placeUnit(matrix, size, firstX, firstY, secondX, secondY, ShipType::Boat))
+			{
+				boatsCount--;
+			}
 			break;
 		case submarineChar:
-			placeUnit(matrix, size, x, y, ShipType::Submarine);
+			if (true)
+			{
+
+			}
+			placeUnit(matrix, size, firstX, firstY, secondX, secondY, ShipType::Submarine);
 			submarinesCount--;
 			break;
 		case destroyerChar:
-			placeUnit(matrix, size, x, y, ShipType::Destroyer);
+			if (true)
+			{
+
+			}
+			placeUnit(matrix, size, firstX, firstY, secondX, secondY, ShipType::Destroyer);
 			destroyersCount--;
 			break;
 		case carrierChar:
-			placeUnit(matrix, size, x, y, ShipType::Carrier);
+			placeUnit(matrix, size, firstX, firstY, secondX, secondY, ShipType::Carrier);
 			carriersCount--;
 			break;
 		default:
@@ -190,14 +246,29 @@ void placeUnits(char** matrix, int size) {
 }
 
 void startGame(char** firstPlayerMatrix, char** secondPlayerMatrix, int size) {
+	if (!firstPlayerMatrix || !secondPlayerMatrix)
+	{
+		return;
+	}
+
 	bool isGameFinished = false;
 	bool firstPlayerTurn = true;
 
-	while (!isGameFinished) {
-		printBattlefiedlsSideBySide(firstPlayerMatrix, secondPlayerMatrix, size);
-		placeUnits(firstPlayerMatrix, size);
-		placeUnits(secondPlayerMatrix, size);
-	}
+	// Show the board
+	printBattlefiedlsSideBySide(firstPlayerMatrix, secondPlayerMatrix, size);
+
+	// Place units for first player
+	placeUnits(firstPlayerMatrix, size);
+
+	// Place units for second player
+	placeUnits(secondPlayerMatrix, size);
+
+	// Show the board
+	printBattlefiedlsSideBySide(firstPlayerMatrix, secondPlayerMatrix, size);
+
+	/*while (!isGameFinished) {
+
+	}*/
 }
 
 int main()
@@ -207,9 +278,11 @@ int main()
 	// For better UX 
 	promptUserToStartGame();
 
+	// Get the size of board
 	int size = readSizeOfMatrix();
 	showGameStartMessage();
 
+	// Initialize the board
 	char** firstPlayerMatrix = new char* [size];
 	char** secondPlayerMatrix = new char* [size];
 	initializeMatrix(firstPlayerMatrix, size);
