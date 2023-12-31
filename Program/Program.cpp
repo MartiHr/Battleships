@@ -2,6 +2,13 @@
 
 using namespace std;
 
+enum ShipType {
+	Boat = 2,
+	Submarine = 3,
+	Destroyer = 4,
+	Carrier = 5
+};
+
 void showLoadingScreen() {
 	cout << "                                     # #  ( )" << endl;
 	cout << "                                  ___#_#___|__" << endl;
@@ -112,6 +119,10 @@ void printBattlefiedlsSideBySide(char** leftMatrix, char** rightMatrix, int size
 	}
 }
 
+void placeAUnit() {
+
+}
+
 int main()
 {
 	showLoadingScreen();
@@ -131,4 +142,5 @@ int main()
 
 	freeMemoryMatrix(firstPlayerMatrix, size);
 	freeMemoryMatrix(secondPlayerMatrix, size);
+	
 }
