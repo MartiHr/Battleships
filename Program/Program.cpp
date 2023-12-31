@@ -17,7 +17,7 @@ const char boatChar = 'b';
 const char submarineChar = 's';
 const char destroyerChar = 'd';
 const char carrierChar = 'c';
-const char destroyedChar = 'c';
+const char destroyedChar = 'X';
 const char horizontalOrientation = 'h';
 const char verticalOrientation = 'v';
 
@@ -136,6 +136,24 @@ bool checkCoordinateIsInside(int coordinate, int size) {
 	return (coordinate >= 0 && coordinate < size);
 }
 
+void placeSymbols(char** matrix, int unitLength, char orientation, int x, int y,char placeSymbol) {
+	if (orientation == verticalOrientation) {
+		int lastXCoordinate = unitLength + x;
+
+		for (int i = x; i < lastXCoordinate; i++)
+		{
+			matrix[i][y] = boatChar;
+		}
+	}
+	else if (orientation == horizontalOrientation) {
+		int lastYCoordinate = unitLength + y;
+
+		for (int i = y; i < lastYCoordinate; i++)
+		{
+			matrix[x][i] = boatChar;
+		}
+	}
+}
 
 // return a boolean and validate coordinates inside
 bool placeUnit(char** matrix, int size, int x, int y, char orientation, ShipType unitType) {
@@ -148,34 +166,18 @@ bool placeUnit(char** matrix, int size, int x, int y, char orientation, ShipType
 	switch (unitType)
 	{
 	case Boat:
-		if (orientation == verticalOrientation) {
-			int lastXCoordinate = unitLength + x;
-
-			for (int i = x; i < lastXCoordinate; i++)
-			{
-				matrix[i][y] = boatChar;
-			}
-		}
-		else if (orientation == horizontalOrientation) {
-			int lastYCoordinate = unitLength + y;
-
-			for (int i = y; i < lastYCoordinate; i++)
-			{
-				matrix[x][i] = boatChar;
-			}
-		}
-		break;
+		placeSymbols(matrix, unitLength, orientation, x, y, boatChar);
 	case Submarine:
-		//matrix[firstX][firstY] = submarineChar;
+		placeSymbols(matrix, unitLength, orientation, x, y, submarineChar);
 		break;
 	case Destroyer:
-		//matrix[firstX][firstY] = destroyedChar;
+		placeSymbols(matrix, unitLength, orientation, x, y, destroyedChar);
 		break;
 	case Carrier:
-		//matrix[firstX][firstY] = carrierChar;
+		placeSymbols(matrix, unitLength, orientation, x, y, carrierChar);
 		break;
 	case Destroyed:
-		//matrix[firstX][firstY] = destroyedChar;
+		placeSymbols(matrix, unitLength, orientation, x, y, destroyedChar);
 		break;
 	default:
 		break;
