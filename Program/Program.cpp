@@ -88,20 +88,47 @@ void initializeMatrix(char** matrix, int size) {
 	}
 }
 
+void printBattlefiedlsSideBySide(char** leftMatrix, char** rightMatrix, int size) {
+	if (!leftMatrix || !rightMatrix) {
+		return;
+	}
+
+	for (int i = 0; i < size; i++)
+	{
+
+		for (int j = 0; j < size; j++)
+		{
+			cout << leftMatrix[i][j];
+		}
+
+		cout << '\t';
+
+		for (int j = 0; j < size; j++)
+		{
+			cout << rightMatrix[i][j];
+		}
+
+		cout << endl;
+	}
+}
+
 int main()
 {
 	showLoadingScreen();
-	
+
 	// For better UX 
 	promptUserToStartGame();
-	
+
 	int size = readSizeOfMatrix();
 	showGameStartMessage();
 
-	char** matrix = new char* [size];
-	initializeMatrix(matrix, size);
+	char** firstPlayerMatrix = new char* [size];
+	char** secondPlayerMatrix = new char* [size];
+	initializeMatrix(firstPlayerMatrix, size);
+	initializeMatrix(secondPlayerMatrix, size);
 
-	printMatrix(matrix, size);
-	freeMemoryMatrix(matrix, size);
+	printBattlefiedlsSideBySide(firstPlayerMatrix, secondPlayerMatrix, size);
 
+	freeMemoryMatrix(firstPlayerMatrix, size);
+	freeMemoryMatrix(secondPlayerMatrix, size);
 }
