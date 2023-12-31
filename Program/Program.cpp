@@ -9,7 +9,7 @@ enum ShipType {
 	Carrier = 5
 };
 
-const char placeUnitsMeesage[] = "The current player should place their units.";
+const char placeUnitsMeesage[] = "The current player should place their units: ";
 
 const char waterChar = '~';
 const char boatChar = 'b';
@@ -47,7 +47,7 @@ void printWrongInputMessage() {
 }
 
 void promptUserToStartGame() {
-	cout << "Please enter the size of the game field and press ENTER to start: ";
+	cout << "Please enter the size for both game fields and press ENTER to start: ";
 }
 
 void showGameStartMessage() {
@@ -133,16 +133,25 @@ void placeAUnit(char** matrix, int size, int x, int y, ShipType unitType) {
 	}
 }
 
-void showPlaceUnitsMessage() {
-	cout << placeUnitsMeesage << endl;
+void showPlaceUnitsMessage(int boatsCount, int submarinesCount, int destroyersCount, int carriersCount) {
+	cout << placeUnitsMeesage << boatsCount << " boats, "
+		<< submarinesCount <<  " submarines, " 
+		<< destroyersCount << " destroyers, "
+		<< carriersCount << "and carriers."
+		<< endl;
 }
 
-void placeUnits(char** matrix, int size) {
+void placeUnits(char** matrix, int size, int boatsCount, int submarinesCount, int destroyersCount, int carriersCount) {
 	if (!matrix) {
 		return;
 	}
 
-	showPlaceUnitMessage();
+	showPlaceUnitsMessage(boatsCount, submarinesCount,  destroyersCount, carriersCount);
+
+	while (boatsCount != 0 && submarinesCount  && destroyersCount != 0 && carriersCount != 0)
+	{
+
+	}
 }
 
 int main()
@@ -164,7 +173,6 @@ int main()
 	bool firstPlayerTurn = true;
 	while (!isGameFinished)
 	{
-		
 		printBattlefiedlsSideBySide(firstPlayerMatrix, secondPlayerMatrix, size);
 		placeUnits(firstPlayerMatrix, size);
 		placeUnits(secondPlayerMatrix, size);

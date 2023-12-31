@@ -1,2 +1,5 @@
 ﻿  Program.cpp
-  Program.vcxproj -> C:\Users\marti\Desktop\Battleships\x64\Debug\Program.exe
+C:\Users\marti\Desktop\Battleships\Program\Program.cpp(178,37): error C2660: 'placeUnits': function does not take 2 arguments
+C:\Users\marti\Desktop\Battleships\Program\Program.cpp(144,6): message : see declaration of 'placeUnits'
+C:\Users\marti\Desktop\Battleships\Program\Program.cpp(179,38): error C2660: 'placeUnits': function does not take 2 arguments
+C:\Users\marti\Desktop\Battleships\Program\Program.cpp(144,6): message : see declaration of 'placeUnits'
