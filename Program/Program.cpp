@@ -143,29 +143,39 @@ bool placeUnit(char** matrix, int size, int x, int y, char orientation, ShipType
 		return false;
 	}
 
+	int unitLength = (int)unitType;
+
 	switch (unitType)
 	{
 	case Boat:
-		if (orientation == horizontalOrientation)
-		{
-			for (int i = 0; i < (int)unitType; i++)
-			{
+		if (orientation == verticalOrientation) {
+			int lastXCoordinate = unitLength + x;
 
+			for (int i = x; i < lastXCoordinate; i++)
+			{
+				matrix[i][y] = boatChar;
 			}
 		}
-		matrix[firstX][firstY] = boatChar;
+		else if (orientation == horizontalOrientation) {
+			int lastYCoordinate = unitLength + y;
+
+			for (int i = y; i < lastYCoordinate; i++)
+			{
+				matrix[x][i] = boatChar;
+			}
+		}
 		break;
 	case Submarine:
-		matrix[firstX][firstY] = submarineChar;
+		//matrix[firstX][firstY] = submarineChar;
 		break;
 	case Destroyer:
-		matrix[firstX][firstY] = destroyedChar;
+		//matrix[firstX][firstY] = destroyedChar;
 		break;
 	case Carrier:
-		matrix[firstX][firstY] = carrierChar;
+		//matrix[firstX][firstY] = carrierChar;
 		break;
 	case Destroyed:
-		matrix[firstX][firstY] = destroyedChar;
+		//matrix[firstX][firstY] = destroyedChar;
 		break;
 	default:
 		break;
@@ -180,6 +190,10 @@ void showPlaceUnitsMessage(int boatsCount, int submarinesCount, int destroyersCo
 		<< destroyersCount << " destroyers, "
 		<< "and " << carriersCount << " carriers."
 		<< endl;
+}
+
+bool isOrientationValid(char orientation) {
+	return (orientation == verticalOrientation || orientation == horizontalOrientation);
 }
 
 void placeUnits(char** matrix, int size) {
@@ -198,6 +212,14 @@ void placeUnits(char** matrix, int size) {
 		cout << "Enter type of unit : ";
 		char unitType = ' ';
 		cin >> unitType;
+
+		cout << "Enter orientation (h for horizontal, v - for vertical): ";
+		char orientation = ' ';
+		cin >> orientation;
+		while (!isOrientationValid(orientation)) {
+			cout << "Wrong orientation input, enter orientation again : ";
+			cin >> orientation;
+		}
 
 		//TODO: validate if coordinates have been already shot
 		int startX = -1;
@@ -218,24 +240,24 @@ void placeUnits(char** matrix, int size) {
 
 		switch (unitType) {
 		case boatChar:
-			if (placeUnit(matrix, size, startX, startY, 'h', ShipType::Boat)) {
+			if (placeUnit(matrix, size, startX, startY, orientation, ShipType::Boat)) {
 				boatsCount--;
 			}
 			break;
 		case submarineChar:
 		
-			placeUnit(matrix, size, startX, startY, 'h', ShipType::Submarine);
+			placeUnit(matrix, size, startX, startY, orientation, ShipType::Submarine);
 			submarinesCount--;
 			break;
 		case destroyerChar:
 			if (true) {
 
 			}
-			placeUnit(matrix, size, startX, startY, 'h', ShipType::Destroyer);
+			placeUnit(matrix, size, startX, startY, orientation, ShipType::Destroyer);
 			destroyersCount--;
 			break;
 		case carrierChar:
-			placeUnit(matrix, size, startX, startY, 'h', ShipType::Carrier);
+			placeUnit(matrix, size, startX, startY, orientation, ShipType::Carrier);
 			carriersCount--;
 			break;
 		default:
