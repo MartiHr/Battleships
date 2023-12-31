@@ -18,6 +18,8 @@ const char submarineChar = 's';
 const char destroyerChar = 'd';
 const char carrierChar = 'c';
 const char destroyedChar = 'c';
+const char horizontalOrientation = 'h';
+const char verticalOrientation = 'v';
 
 void showLoadingScreen() {
 	cout << "                                     # #  ( )" << endl;
@@ -117,7 +119,7 @@ void printBattlefiedlsSideBySide(char** leftMatrix, char** rightMatrix, int size
 		{
 			cout << leftMatrix[i][j];
 		}
-		
+
 		// Print a tabular
 		cout << '\t';
 
@@ -134,33 +136,42 @@ bool checkCoordinateIsInside(int coordinate, int size) {
 	return (coordinate >= 0 && coordinate < size);
 }
 
+
 // return a boolean and validate coordinates inside
-bool placeUnit(char** matrix, int size, int firstX, int firstY, int secondX, int secondY, ShipType unitType) {
+bool placeUnit(char** matrix, int size, int x, int y, char orientation, ShipType unitType) {
 	if (!matrix) {
-		return;
-	}
-
-	if (checkCoordinatesInsideBoard(firstX, firstY, secondX, secondY))
-	{
-
+		return false;
 	}
 
 	switch (unitType)
 	{
 	case Boat:
+		if (orientation == horizontalOrientation)
+		{
+			for (int i = 0; i < (int)unitType; i++)
+			{
+
+			}
+		}
 		matrix[firstX][firstY] = boatChar;
 		break;
 	case Submarine:
+		matrix[firstX][firstY] = submarineChar;
 		break;
 	case Destroyer:
+		matrix[firstX][firstY] = destroyedChar;
 		break;
 	case Carrier:
+		matrix[firstX][firstY] = carrierChar;
 		break;
 	case Destroyed:
+		matrix[firstX][firstY] = destroyedChar;
 		break;
 	default:
 		break;
 	}
+
+	return true;
 }
 
 void showPlaceUnitsMessage(int boatsCount, int submarinesCount, int destroyersCount, int carriersCount) {
@@ -188,55 +199,43 @@ void placeUnits(char** matrix, int size) {
 		char unitType = ' ';
 		cin >> unitType;
 
-		int firstX = -1;
-		cout << "Enter first x coordinate : ";
-		cin >> firstX;
-		while (!checkCoordinateIsInside(firstX, size)) {
-			cout << "Coordinate outside of board, enter first x coordinate again : " << endl;
-			cin >> firstX;
+		//TODO: validate if coordinates have been already shot
+		int startX = -1;
+		cout << "Enter start x coordinate : ";
+		cin >> startX;
+		while (!checkCoordinateIsInside(startX, size)) {
+			cout << "Coordinate outside of board, enter start x coordinate again : ";
+			cin >> startX;
 		}
 
-		cout << "Enter first y coordinate: ";
-		int firstY = -1;
-		cin >> firstY;
-		while (!checkCoordinateIsInside(firstY, size)) {
-			cout << "Coordinate outside of board, enter first x coordinate again : " << endl;
-			cin >> firstY;
+		cout << "Enter start y coordinate: ";
+		int startY = -1;
+		cin >> startY;
+		while (!checkCoordinateIsInside(startY, size)) {
+			cout << "Coordinate outside of board, enter start y coordinate again : ";
+			cin >> startY;
 		}
-
-		cout << "Enter second x coordinate : ";
-		int secondX = -1;
-		cin >> secondX;
-
-		cout << "Enter second y coordinate: ";
-		int secondY = -1;
-		cin >> secondY;
 
 		switch (unitType) {
 		case boatChar:
-			if (placeUnit(matrix, size, firstX, firstY, secondX, secondY, ShipType::Boat))
-			{
+			if (placeUnit(matrix, size, startX, startY, 'h', ShipType::Boat)) {
 				boatsCount--;
 			}
 			break;
 		case submarineChar:
-			if (true)
-			{
-
-			}
-			placeUnit(matrix, size, firstX, firstY, secondX, secondY, ShipType::Submarine);
+		
+			placeUnit(matrix, size, startX, startY, 'h', ShipType::Submarine);
 			submarinesCount--;
 			break;
 		case destroyerChar:
-			if (true)
-			{
+			if (true) {
 
 			}
-			placeUnit(matrix, size, firstX, firstY, secondX, secondY, ShipType::Destroyer);
+			placeUnit(matrix, size, startX, startY, 'h', ShipType::Destroyer);
 			destroyersCount--;
 			break;
 		case carrierChar:
-			placeUnit(matrix, size, firstX, firstY, secondX, secondY, ShipType::Carrier);
+			placeUnit(matrix, size, startX, startY, 'h', ShipType::Carrier);
 			carriersCount--;
 			break;
 		default:
