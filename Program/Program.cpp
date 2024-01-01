@@ -122,7 +122,7 @@ void printBattlefiedlsSideBySide(char** leftMatrix, char** rightMatrix, int size
 		}
 
 		// Print a tabular
-		cout << "\t\t\t";
+		cout << "\t\t\t\t\t";
 
 		for (int j = 0; j < size; j++)
 		{
@@ -294,7 +294,7 @@ void playerTurn(char** attackingMatrix, char** defendingMatrix, int size) {
 	// Check the result of the attack
 	if (defendingMatrix[x][y] == WATER_CHAR) {
 		cout << "Miss!" << endl;
-		attackingMatrix[x][y] = 'o';  // 'o' for miss
+		attackingMatrix[x][y] = MISSED_CHAR;  // 'O' for miss
 	}
 	else {
 		cout << "Hit!" << endl;
@@ -304,18 +304,23 @@ void playerTurn(char** attackingMatrix, char** defendingMatrix, int size) {
 }
 
 bool isGameOver(char** matrix, int size) {
+	if (!matrix)
+	{
+		return false;
+	}
+
 	for (int i = 0; i < size; i++)
 	{
 		for (int j = 0; j < size; j++)
 		{
 			if (matrix[i][j] != WATER_CHAR && matrix[i][j] != DESTROYED_CHAR && matrix[i][j] != MISSED_CHAR)
 			{
-				return true;
+				return false;
 			}
 		}
 	}
 
-	return false;
+	return true;
 }
 
 
@@ -325,7 +330,7 @@ void playGame(char** firstPlayerMatrix, char** secondPlayerMatrix, int size) {
 
 	while (!isGameFinished) {
 		// Display the boards
-		cout << "Player 1's Board\t\t\t\t\tPlayer 2's Board" << endl;
+		cout << "Player 1's Board\t\t\t\tPlayer 2's Board" << endl;
 		printBattlefiedlsSideBySide(firstPlayerMatrix, secondPlayerMatrix, size);
 
 		// Determine current player
