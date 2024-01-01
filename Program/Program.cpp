@@ -15,12 +15,12 @@ const char placeUnitsMeesage[] = "";
 const char WATER_CHAR = '~';
 const char BOAT_CHAR = 'b';
 const char SUBMARINE_CHAR = 's';
-const char destroyerChar = 'd';
-const char carrierChar = 'c';
-const char destroyedChar = 'X';
-const char missedChar = 'O';
-const char horizontalOrientation = 'h';
-const char verticalOrientation = 'v';
+const char DESTROYER_CHAR = 'd';
+const char CARRIER_CHAR = 'c';
+const char DESTROYED_CHAR = 'X';
+const char MISSED_CHAR = 'O';
+const char HORIZONTAL_ORIENTATION = 'h';
+const char VERTICAL_ORIENTATION = 'v';
 
 void showLoadingScreen() {
 	cout << "                                     # #  ( )" << endl;
@@ -122,7 +122,7 @@ void printBattlefiedlsSideBySide(char** leftMatrix, char** rightMatrix, int size
 		}
 
 		// Print a tabular
-		cout << '\t';
+		cout << "\t\t\t";
 
 		for (int j = 0; j < size; j++)
 		{
@@ -138,20 +138,18 @@ bool checkCoordinateIsInside(int coordinate, int size) {
 }
 
 void placeSymbols(char** matrix, int unitLength, char orientation, int x, int y, char placeSymbol) {
-	if (orientation == verticalOrientation) {
+	if (orientation == VERTICAL_ORIENTATION) {
 		int lastXCoordinate = unitLength + x;
 
-		for (int i = x; i < lastXCoordinate; i++)
-		{
-			matrix[i][y] = BOAT_CHAR;
+		for (int i = x; i < lastXCoordinate; i++) {
+			matrix[i][y] = placeSymbol;
 		}
 	}
-	else if (orientation == horizontalOrientation) {
+	else if (orientation == HORIZONTAL_ORIENTATION) {
 		int lastYCoordinate = unitLength + y;
 
-		for (int i = y; i < lastYCoordinate; i++)
-		{
-			matrix[x][i] = BOAT_CHAR;
+		for (int i = y; i < lastYCoordinate; i++) {
+			matrix[x][i] = placeSymbol;
 		}
 	}
 }
@@ -166,22 +164,22 @@ bool placeUnit(char** matrix, int size, int x, int y, char orientation, ShipType
 
 	switch (unitType)
 	{
-	case Boat:
-		placeSymbols(matrix, unitLength, orientation, x, y, BOAT_CHAR);
-	case Submarine:
-		placeSymbols(matrix, unitLength, orientation, x, y, SUBMARINE_CHAR);
-		break;
-	case Destroyer:
-		placeSymbols(matrix, unitLength, orientation, x, y, destroyedChar);
-		break;
-	case Carrier:
-		placeSymbols(matrix, unitLength, orientation, x, y, carrierChar);
-		break;
-	case Destroyed:
-		placeSymbols(matrix, unitLength, orientation, x, y, destroyedChar);
-		break;
-	default:
-		break;
+		case Boat:
+			placeSymbols(matrix, unitLength, orientation, x, y, BOAT_CHAR);
+		case Submarine:
+			placeSymbols(matrix, unitLength, orientation, x, y, SUBMARINE_CHAR);
+			break;
+		case Destroyer:
+			placeSymbols(matrix, unitLength, orientation, x, y, DESTROYER_CHAR);
+			break;
+		case Carrier:
+			placeSymbols(matrix, unitLength, orientation, x, y, CARRIER_CHAR);
+			break;
+		case Destroyed:
+			placeSymbols(matrix, unitLength, orientation, x, y, DESTROYED_CHAR);
+			break;
+		default:
+			break;
 	}
 
 	return true;
@@ -198,7 +196,7 @@ void showPlaceUnitsMessage(int boatsCount, int submarinesCount, int destroyersCo
 }
 
 bool isOrientationValid(char orientation) {
-	return (orientation == verticalOrientation || orientation == horizontalOrientation);
+	return (orientation == VERTICAL_ORIENTATION || orientation == HORIZONTAL_ORIENTATION);
 }
 
 void placeUnits(char** matrix, int size, bool isFirstPlayer) {
@@ -207,22 +205,27 @@ void placeUnits(char** matrix, int size, bool isFirstPlayer) {
 	}
 
 	int boatsCount = 1;
-	int submarinesCount = 1;
-	int destroyersCount = 1;
-	int carriersCount = 1;
+	int submarinesCount = 0;
+	int destroyersCount = 0;
+	int carriersCount = 0;
 
 	while (boatsCount != 0 || submarinesCount != 0 || destroyersCount != 0 || carriersCount != 0) {
 		showPlaceUnitsMessage(boatsCount, submarinesCount, destroyersCount, carriersCount, isFirstPlayer);
 
-		cout << "Enter type of unit : ";
+		cout << "Enter type of unit - b for (b)oat, (s)ubmarine, (d)estroyer, (c)arrier : ";
 		char unitType = ' ';
 		cin >> unitType;
+		while (unitType != BOAT_CHAR && unitType != SUBMARINE_CHAR && unitType != DESTROYER_CHAR && unitType != CARRIER_CHAR)
+		{
+			cout << "Wrong unit, enter type of unit - b for (b)oat, (s)ubmarine, (d)estroyer, (c)arrier again : ";
+			cin >> unitType;
+		}
 
 		cout << "Enter orientation (h for horizontal, v - for vertical): ";
 		char orientation = ' ';
 		cin >> orientation;
 		while (!isOrientationValid(orientation)) {
-			cout << "Wrong orientation input, enter orientation again : ";
+			cout << "Wrong orientation input, enter orientation again (h for horizontal, v - for vertical) : ";
 			cin >> orientation;
 		}
 
@@ -257,13 +260,13 @@ void placeUnits(char** matrix, int size, bool isFirstPlayer) {
 				printMatrix(matrix, size);
 			}
 			break;
-		case destroyerChar:
+		case DESTROYER_CHAR:
 			if (placeUnit(matrix, size, startX, startY, orientation, ShipType::Destroyer)) {
 				destroyersCount--;
 				printMatrix(matrix, size);
 			}
 			break;
-		case carrierChar:
+		case CARRIER_CHAR:
 			if (placeUnit(matrix, size, startX, startY, orientation, ShipType::Carrier))
 			{
 				carriersCount--;
@@ -276,16 +279,96 @@ void placeUnits(char** matrix, int size, bool isFirstPlayer) {
 	}
 }
 
+void playerTurn(char** attackingMatrix, char** defendingMatrix, int size) {
+	// Implement the logic for a player's turn
+	int x, y;
+	cout << "Enter coordinates to attack (x y): ";
+	cin >> x >> y;
+
+	// Validate input
+	while (!checkCoordinateIsInside(x, size) || !checkCoordinateIsInside(y, size)) {
+		cout << "Invalid coordinates. Enter again: ";
+		cin >> x >> y;
+	}
+
+	// Check the result of the attack
+	if (defendingMatrix[x][y] == WATER_CHAR) {
+		cout << "Miss!" << endl;
+		attackingMatrix[x][y] = 'o';  // 'o' for miss
+	}
+	else {
+		cout << "Hit!" << endl;
+		attackingMatrix[x][y] = 'X';  // 'X' for hit
+		defendingMatrix[x][y] = DESTROYED_CHAR;
+	}
+}
+
+bool isGameOver(char** matrix, int size) {
+	for (int i = 0; i < size; i++)
+	{
+		for (int j = 0; j < size; j++)
+		{
+			if (matrix[i][j] != WATER_CHAR && matrix[i][j] != DESTROYED_CHAR && matrix[i][j] != MISSED_CHAR)
+			{
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+
+void playGame(char** firstPlayerMatrix, char** secondPlayerMatrix, int size) {
+	bool isGameFinished = false;
+	bool firstPlayerTurn = true;
+
+	while (!isGameFinished) {
+		// Display the boards
+		cout << "Player 1's Board\t\t\t\t\tPlayer 2's Board" << endl;
+		printBattlefiedlsSideBySide(firstPlayerMatrix, secondPlayerMatrix, size);
+
+		// Determine current player
+		char** currentPlayerMatrix;
+		char** otherPlayerMatrix;
+
+		if (firstPlayerTurn) {
+			currentPlayerMatrix = firstPlayerMatrix;
+			otherPlayerMatrix = secondPlayerMatrix;
+		}
+		else {
+			currentPlayerMatrix = secondPlayerMatrix;
+			otherPlayerMatrix = firstPlayerMatrix;
+		}
+
+		// Player's turn
+		cout << (firstPlayerTurn ? "Player 1's Turn" : "Player 2's Turn") << endl;
+		playerTurn(currentPlayerMatrix, otherPlayerMatrix, size);
+
+		// Check if the game is over
+		isGameFinished = isGameOver(firstPlayerMatrix, size) || isGameOver(secondPlayerMatrix, size);
+
+		// Switch turns
+		firstPlayerTurn = !firstPlayerTurn;
+	}
+
+	// Display the final boards
+	cout << "Player 1's Board\t\t\tPlayer 2's Board" << endl;
+	printBattlefiedlsSideBySide(firstPlayerMatrix, secondPlayerMatrix, size);
+
+	// Display the winner
+	cout << "Game Over! ";
+	cout << (isGameOver(firstPlayerMatrix, size) ? "Player 2 Wins!" : "Player 1 Wins!") << endl;
+}
+
 void startGame(char** firstPlayerMatrix, char** secondPlayerMatrix, int size) {
 	if (!firstPlayerMatrix || !secondPlayerMatrix)
 	{
 		return;
 	}
 
-	bool isGameFinished = false;
-	bool firstPlayerTurn = true;
-
 	// Show the board
+	cout << "Initial Boards:" << endl;
 	printBattlefiedlsSideBySide(firstPlayerMatrix, secondPlayerMatrix, size);
 
 	const bool IT_IS_FIRST_PLAYER = true;
@@ -298,9 +381,8 @@ void startGame(char** firstPlayerMatrix, char** secondPlayerMatrix, int size) {
 	// Show the board
 	printBattlefiedlsSideBySide(firstPlayerMatrix, secondPlayerMatrix, size);
 
-	/*while (!isGameFinished) {
-
-	}*/
+	// Start the turns
+	playGame(firstPlayerMatrix, secondPlayerMatrix, size);
 }
 
 int main()
@@ -311,6 +393,7 @@ int main()
 	promptUserToStartGame();
 
 	// Get the size of board
+	//TODO: validate that input is number
 	int size = readSizeOfMatrix();
 	showGameStartMessage();
 
