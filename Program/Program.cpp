@@ -279,7 +279,7 @@ void placeUnits(char** matrix, int size, bool isFirstPlayer) {
 	}
 }
 
-void playerTurn(char** attackingMatrix, char** defendingMatrix, int size) {
+void playerTurnAttack(char** attackingMatrix, char** defendingMatrix, int size) {
 	// Implement the logic for a player's turn
 	int x, y;
 	cout << "Enter coordinates to attack (x y): ";
@@ -294,11 +294,10 @@ void playerTurn(char** attackingMatrix, char** defendingMatrix, int size) {
 	// Check the result of the attack
 	if (defendingMatrix[x][y] == WATER_CHAR) {
 		cout << "Miss!" << endl;
-		attackingMatrix[x][y] = MISSED_CHAR;  // 'O' for miss
+		defendingMatrix[x][y] = MISSED_CHAR;  // 'O' for miss
 	}
 	else {
 		cout << "Hit!" << endl;
-		attackingMatrix[x][y] = 'X';  // 'X' for hit
 		defendingMatrix[x][y] = DESTROYED_CHAR;
 	}
 }
@@ -325,30 +324,28 @@ bool isGameOver(char** matrix, int size) {
 
 
 void playGame(char** firstPlayerMatrix, char** secondPlayerMatrix, int size) {
+	if (!firstPlayerMatrix || !secondPlayerMatrix)
+	{
+		return;
+	}
+
 	bool isGameFinished = false;
 	bool firstPlayerTurn = true;
 
 	while (!isGameFinished) {
 		// Display the boards
-		cout << "Player 1's Board\t\t\t\tPlayer 2's Board" << endl;
+		cout << "Player 1's Board\t\t\tPlayer 2's Board" << endl;
 		printBattlefiedlsSideBySide(firstPlayerMatrix, secondPlayerMatrix, size);
 
 		// Determine current player
-		char** currentPlayerMatrix;
-		char** otherPlayerMatrix;
-
-		if (firstPlayerTurn) {
-			currentPlayerMatrix = firstPlayerMatrix;
-			otherPlayerMatrix = secondPlayerMatrix;
-		}
-		else {
-			currentPlayerMatrix = secondPlayerMatrix;
-			otherPlayerMatrix = firstPlayerMatrix;
-		}
-
 		// Player's turn
 		cout << (firstPlayerTurn ? "Player 1's Turn" : "Player 2's Turn") << endl;
-		playerTurn(currentPlayerMatrix, otherPlayerMatrix, size);
+		if (firstPlayerTurn) {
+			playerTurnAttack(firstPlayerMatrix, secondPlayerMatrix, size);
+		}
+		else {
+			playerTurnAttack(secondPlayerMatrix, firstPlayerMatrix, size);
+		}
 
 		// Check if the game is over
 		isGameFinished = isGameOver(firstPlayerMatrix, size) || isGameOver(secondPlayerMatrix, size);
