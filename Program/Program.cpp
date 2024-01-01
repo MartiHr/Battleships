@@ -10,14 +10,15 @@ enum ShipType {
 	Carrier = 5
 };
 
-const char placeUnitsMeesage[] = "The current player should place their units: ";
+const char placeUnitsMeesage[] = "";
 
-const char waterChar = '~';
-const char boatChar = 'b';
-const char submarineChar = 's';
+const char WATER_CHAR = '~';
+const char BOAT_CHAR = 'b';
+const char SUBMARINE_CHAR = 's';
 const char destroyerChar = 'd';
 const char carrierChar = 'c';
 const char destroyedChar = 'X';
+const char missedChar = 'O';
 const char horizontalOrientation = 'h';
 const char verticalOrientation = 'v';
 
@@ -102,7 +103,7 @@ void initializeMatrix(char** matrix, int size) {
 
 		for (int j = 0; j < size; j++)
 		{
-			matrix[i][j] = waterChar;
+			matrix[i][j] = WATER_CHAR;
 		}
 	}
 }
@@ -136,13 +137,13 @@ bool checkCoordinateIsInside(int coordinate, int size) {
 	return (coordinate >= 0 && coordinate < size);
 }
 
-void placeSymbols(char** matrix, int unitLength, char orientation, int x, int y,char placeSymbol) {
+void placeSymbols(char** matrix, int unitLength, char orientation, int x, int y, char placeSymbol) {
 	if (orientation == verticalOrientation) {
 		int lastXCoordinate = unitLength + x;
 
 		for (int i = x; i < lastXCoordinate; i++)
 		{
-			matrix[i][y] = boatChar;
+			matrix[i][y] = BOAT_CHAR;
 		}
 	}
 	else if (orientation == horizontalOrientation) {
@@ -150,7 +151,7 @@ void placeSymbols(char** matrix, int unitLength, char orientation, int x, int y,
 
 		for (int i = y; i < lastYCoordinate; i++)
 		{
-			matrix[x][i] = boatChar;
+			matrix[x][i] = BOAT_CHAR;
 		}
 	}
 }
@@ -166,9 +167,9 @@ bool placeUnit(char** matrix, int size, int x, int y, char orientation, ShipType
 	switch (unitType)
 	{
 	case Boat:
-		placeSymbols(matrix, unitLength, orientation, x, y, boatChar);
+		placeSymbols(matrix, unitLength, orientation, x, y, BOAT_CHAR);
 	case Submarine:
-		placeSymbols(matrix, unitLength, orientation, x, y, submarineChar);
+		placeSymbols(matrix, unitLength, orientation, x, y, SUBMARINE_CHAR);
 		break;
 	case Destroyer:
 		placeSymbols(matrix, unitLength, orientation, x, y, destroyedChar);
@@ -186,8 +187,10 @@ bool placeUnit(char** matrix, int size, int x, int y, char orientation, ShipType
 	return true;
 }
 
-void showPlaceUnitsMessage(int boatsCount, int submarinesCount, int destroyersCount, int carriersCount) {
-	cout << placeUnitsMeesage << boatsCount << " boats, "
+void showPlaceUnitsMessage(int boatsCount, int submarinesCount, int destroyersCount, int carriersCount, bool isFirstPlayer) {
+	cout << "The " << (isFirstPlayer ? "first" : "second")
+		<< " player should place their units : "
+		<< boatsCount << " boats, "
 		<< submarinesCount << " submarines, "
 		<< destroyersCount << " destroyers, "
 		<< "and " << carriersCount << " carriers."
@@ -198,7 +201,7 @@ bool isOrientationValid(char orientation) {
 	return (orientation == verticalOrientation || orientation == horizontalOrientation);
 }
 
-void placeUnits(char** matrix, int size) {
+void placeUnits(char** matrix, int size, bool isFirstPlayer) {
 	if (!matrix) {
 		return;
 	}
@@ -208,8 +211,8 @@ void placeUnits(char** matrix, int size) {
 	int destroyersCount = 1;
 	int carriersCount = 1;
 
-	while (boatsCount != 0 && submarinesCount && destroyersCount != 0 && carriersCount != 0) {
-		showPlaceUnitsMessage(boatsCount, submarinesCount, destroyersCount, carriersCount);
+	while (boatsCount != 0 || submarinesCount != 0 || destroyersCount != 0 || carriersCount != 0) {
+		showPlaceUnitsMessage(boatsCount, submarinesCount, destroyersCount, carriersCount, isFirstPlayer);
 
 		cout << "Enter type of unit : ";
 		char unitType = ' ';
@@ -241,26 +244,31 @@ void placeUnits(char** matrix, int size) {
 		}
 
 		switch (unitType) {
-		case boatChar:
+		case BOAT_CHAR:
 			if (placeUnit(matrix, size, startX, startY, orientation, ShipType::Boat)) {
 				boatsCount--;
+				printMatrix(matrix, size);
 			}
 			break;
-		case submarineChar:
-		
-			placeUnit(matrix, size, startX, startY, orientation, ShipType::Submarine);
-			submarinesCount--;
+		case SUBMARINE_CHAR:
+			if (placeUnit(matrix, size, startX, startY, orientation, ShipType::Submarine))
+			{
+				submarinesCount--;
+				printMatrix(matrix, size);
+			}
 			break;
 		case destroyerChar:
-			if (true) {
-
+			if (placeUnit(matrix, size, startX, startY, orientation, ShipType::Destroyer)) {
+				destroyersCount--;
+				printMatrix(matrix, size);
 			}
-			placeUnit(matrix, size, startX, startY, orientation, ShipType::Destroyer);
-			destroyersCount--;
 			break;
 		case carrierChar:
-			placeUnit(matrix, size, startX, startY, orientation, ShipType::Carrier);
-			carriersCount--;
+			if (placeUnit(matrix, size, startX, startY, orientation, ShipType::Carrier))
+			{
+				carriersCount--;
+				printMatrix(matrix, size);
+			}
 			break;
 		default:
 			break;
@@ -280,11 +288,12 @@ void startGame(char** firstPlayerMatrix, char** secondPlayerMatrix, int size) {
 	// Show the board
 	printBattlefiedlsSideBySide(firstPlayerMatrix, secondPlayerMatrix, size);
 
+	const bool IT_IS_FIRST_PLAYER = true;
 	// Place units for first player
-	placeUnits(firstPlayerMatrix, size);
+	placeUnits(firstPlayerMatrix, size, IT_IS_FIRST_PLAYER);
 
 	// Place units for second player
-	placeUnits(secondPlayerMatrix, size);
+	placeUnits(secondPlayerMatrix, size, !IT_IS_FIRST_PLAYER);
 
 	// Show the board
 	printBattlefiedlsSideBySide(firstPlayerMatrix, secondPlayerMatrix, size);
