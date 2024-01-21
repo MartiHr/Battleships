@@ -10,10 +10,8 @@ enum ShipType {
 	Carrier = 5
 };
 
-const char placeUnitsMeesage[] = "";
-
 const int MIN_SIZE = 3;
-const int MAX_SIZE = 50;
+const int MAX_SIZE = 41;
 const char WATER_CHAR = '~';
 const char BOAT_CHAR = 'b';
 const char SUBMARINE_CHAR = 's';
@@ -176,18 +174,27 @@ void printColumnIndices(int size) {
 	std::cout << std::endl;
 }
 
-void printBattlefiedlsSideBySide(char** leftMatrix, char** rightMatrix, int size, bool hidden = true) {
+void printBattlefieldsSideBySide(char** leftMatrix, char** rightMatrix, int size, bool hidden = true) {
 	if (!leftMatrix || !rightMatrix) {
 		return;
 	}
 
-	printColumnIndices(size);
+	const int maxSizeForUpperIndices = 12;
+
+	if (size < maxSizeForUpperIndices)
+	{
+		printColumnIndices(size);
+	}
 
 	// Print the matrices with row indices
 	for (int i = 0; i < size; i++) {
 		// Print row index
-		std::cout << i << " |";
-
+		if (i < 10) {
+			std::cout << i << " |";
+		}
+		else {
+			std::cout << i << "|";
+		}
 		// Print left matrix
 		for (int j = 0; j < size; j++) {
 			char current = leftMatrix[i][j];
@@ -527,8 +534,8 @@ void playGame(char** firstPlayerMatrix, char** secondPlayerMatrix, int size) {
 
 	while (!isGameFinished) {
 		// Display the boards
-		cout << "Player 1's Board\t\t\tPlayer 2's Board" << endl;
-		printBattlefiedlsSideBySide(firstPlayerMatrix, secondPlayerMatrix, size);
+		/*cout << "Player 1's Board\t\t\tPlayer 2's Board" << endl;
+		printBattlefieldsSideBySide(firstPlayerMatrix, secondPlayerMatrix, size);*/
 
 		// Determine current player
 		// Player's turn
@@ -548,8 +555,8 @@ void playGame(char** firstPlayerMatrix, char** secondPlayerMatrix, int size) {
 	}
 
 	// Display the final boards
-	cout << "Player 1's Board\t\t\tPlayer 2's Board" << endl;
-	printBattlefiedlsSideBySide(firstPlayerMatrix, secondPlayerMatrix, size, false);
+	cout << "Final boards:" << endl;
+	printBattlefieldsSideBySide(firstPlayerMatrix, secondPlayerMatrix, size, false);
 
 	// Display the winner
 	cout << "Game Over! ";
@@ -579,19 +586,17 @@ void startGame(char** firstPlayerMatrix, char** secondPlayerMatrix, int size) {
 
 	printInitialBoardsMessage();
 	// Show the board
-	printBattlefiedlsSideBySide(firstPlayerMatrix, secondPlayerMatrix, size);
+	printBattlefieldsSideBySide(firstPlayerMatrix, secondPlayerMatrix, size);
 
 	const bool IT_IS_FIRST_PLAYER = true;
 	// Place units for first player
 	placeUnits(firstPlayerMatrix, size, IT_IS_FIRST_PLAYER);
 
-	printSpacingToHidePlayerMoves();
+	// (Optional)
+	//printSpacingToHidePlayerMoves();
 
 	// Place units for second player
 	placeUnits(secondPlayerMatrix, size, !IT_IS_FIRST_PLAYER);
-
-	// Show the board
-	printBattlefiedlsSideBySide(firstPlayerMatrix, secondPlayerMatrix, size);
 
 	// Start the turns
 	playGame(firstPlayerMatrix, secondPlayerMatrix, size);
