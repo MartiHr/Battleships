@@ -159,26 +159,12 @@ bool placeSymbols(char** matrix, int unitLength, char orientation, int x, int y,
 	if (orientation == VERTICAL_ORIENTATION) {
 		int lastXCoordinate = unitLength + x;
 
-		// Check if placement is possible
-		for (int i = x; i < lastXCoordinate; i++) {
-			if (matrix[i][y] != WATER_CHAR) {
-				return false;
-			}
-		}
-
 		for (int i = x; i < lastXCoordinate; i++) {
 			matrix[i][y] = placeSymbol;
 		}
 	}
 	else if (orientation == HORIZONTAL_ORIENTATION) {
 		int lastYCoordinate = unitLength + y;
-
-		// Check if placement is possible
-		for (int i = y; i < lastYCoordinate; i++) {
-			if (matrix[x][i] != WATER_CHAR) {
-				return false;
-			}
-		}
 
 		for (int i = y; i < lastYCoordinate; i++) {
 			matrix[x][i] = placeSymbol;
@@ -199,7 +185,7 @@ bool checkOverlap(char** matrix, int unitLength, char orientation, int x, int y)
 		// Check if placement is possible
 		for (int i = x; i < lastXCoordinate; i++) {
 			if (matrix[i][y] != WATER_CHAR) {
-				return false;
+				return true;
 			}
 		}
 	}
@@ -209,12 +195,12 @@ bool checkOverlap(char** matrix, int unitLength, char orientation, int x, int y)
 		// Check if placement is possible
 		for (int i = y; i < lastYCoordinate; i++) {
 			if (matrix[x][i] != WATER_CHAR) {
-				return false;
+				return true;
 			}
 		}
 	}
 
-	return true;
+	return false;
 }
 
 // return a boolean and validate coordinates inside
@@ -226,8 +212,7 @@ bool placeUnit(char** matrix, int size, int x, int y, char orientation, ShipType
 	int unitLength = (int)unitType;
 
 	// Check for overlapping
-	if (unitType != Destroyed && checkOverlap(matrix, unitLength, orientation, x, y))
-	{
+	if (unitType != Destroyed && checkOverlap(matrix, unitLength, orientation, x, y)) {
 		return false;
 	}
 
@@ -252,7 +237,7 @@ bool placeUnit(char** matrix, int size, int x, int y, char orientation, ShipType
 			break;
 	}
 
-	return false;
+	return true;
 }
 
 void showPlaceUnitsMessage(int boatsCount, int submarinesCount, int destroyersCount, int carriersCount, bool isFirstPlayer) {
@@ -269,6 +254,41 @@ bool isOrientationValid(char orientation) {
 	return (orientation == VERTICAL_ORIENTATION || orientation == HORIZONTAL_ORIENTATION);
 }
 
+void readStartCoordinates(int& startX, int& startY, int size) {
+	cout << "Enter start x coordinate : ";
+	cin >> startX;
+	while (!checkCoordinateIsInside(startX, size)) {
+		cout << "Coordinate outside of board, enter start x coordinate again : ";
+		cin >> startX;
+	}
+
+	cout << "Enter start y coordinate: ";
+	cin >> startY;
+	while (!checkCoordinateIsInside(startY, size)) {
+		cout << "Coordinate outside of board, enter start y coordinate again : ";
+		cin >> startY;
+	}
+}
+
+void readOrientation(char& orientation) {
+	cout << "Enter orientation (h for horizontal, v - for vertical): ";
+	cin >> orientation;
+	while (!isOrientationValid(orientation)) {
+		cout << "Wrong orientation input, enter orientation again (h for horizontal, v - for vertical) : ";
+		cin >> orientation;
+	}
+}
+
+void readUnitType(char unitType) {
+	cout << "Enter type of unit - b for (b)oat, (s)ubmarine, (d)estroyer, (c)arrier : ";
+	cin >> unitType;
+	while (unitType != BOAT_CHAR && unitType != SUBMARINE_CHAR && unitType != DESTROYER_CHAR && unitType != CARRIER_CHAR)
+	{
+		cout << "Wrong unit, enter type of unit - b for (b)oat, (s)ubmarine, (d)estroyer, (c)arrier again : ";
+		cin >> unitType;
+	}
+}
+
 void placeUnits(char** matrix, int size, bool isFirstPlayer) {
 	if (!matrix) {
 		return;
@@ -282,39 +302,16 @@ void placeUnits(char** matrix, int size, bool isFirstPlayer) {
 	while (boatsCount != 0 || submarinesCount != 0 || destroyersCount != 0 || carriersCount != 0) {
 		showPlaceUnitsMessage(boatsCount, submarinesCount, destroyersCount, carriersCount, isFirstPlayer);
 
-		cout << "Enter type of unit - b for (b)oat, (s)ubmarine, (d)estroyer, (c)arrier : ";
 		char unitType = ' ';
-		cin >> unitType;
-		while (unitType != BOAT_CHAR && unitType != SUBMARINE_CHAR && unitType != DESTROYER_CHAR && unitType != CARRIER_CHAR)
-		{
-			cout << "Wrong unit, enter type of unit - b for (b)oat, (s)ubmarine, (d)estroyer, (c)arrier again : ";
-			cin >> unitType;
-		}
+		readUnitType(unitType);
 
-		cout << "Enter orientation (h for horizontal, v - for vertical): ";
 		char orientation = ' ';
-		cin >> orientation;
-		while (!isOrientationValid(orientation)) {
-			cout << "Wrong orientation input, enter orientation again (h for horizontal, v - for vertical) : ";
-			cin >> orientation;
-		}
+		readOrientation(orientation);
 
 		//TODO: validate if coordinates have been already shot
 		int startX = -1;
-		cout << "Enter start x coordinate : ";
-		cin >> startX;
-		while (!checkCoordinateIsInside(startX, size)) {
-			cout << "Coordinate outside of board, enter start x coordinate again : ";
-			cin >> startX;
-		}
-
-		cout << "Enter start y coordinate: ";
 		int startY = -1;
-		cin >> startY;
-		while (!checkCoordinateIsInside(startY, size)) {
-			cout << "Coordinate outside of board, enter start y coordinate again : ";
-			cin >> startY;
-		}
+		readStartCoordinates(startX, startY, size);
 
 		bool unitWasPlaced = false;
 
@@ -327,23 +324,46 @@ void placeUnits(char** matrix, int size, bool isFirstPlayer) {
 					boatsCount--;
 					printMatrix(matrix, size);
 				}
+				else {
+					cout << "Cannot place unit there it overlaps. ";
+					readOrientation(orientation);
+					readStartCoordinates(startX, startY, size);
+				}
 				break;
 			case SUBMARINE_CHAR:
 				if (placeUnit(matrix, size, startX, startY, orientation, ShipType::Submarine)) {
+					unitWasPlaced = true;
 					submarinesCount--;
 					printMatrix(matrix, size);
+				}
+				else {
+					cout << "Cannot place unit there it overlaps. ";
+					readOrientation(orientation);
+					readStartCoordinates(startX, startY, size);
 				}
 				break;
 			case DESTROYER_CHAR:
 				if (placeUnit(matrix, size, startX, startY, orientation, ShipType::Destroyer)) {
+					unitWasPlaced = true;
 					destroyersCount--;
 					printMatrix(matrix, size);
+				}
+				else {
+					cout << "Cannot place unit there it overlaps. ";
+					readOrientation(orientation);
+					readStartCoordinates(startX, startY, size);
 				}
 				break;
 			case CARRIER_CHAR:
 				if (placeUnit(matrix, size, startX, startY, orientation, ShipType::Carrier)) {
+					unitWasPlaced = true;
 					carriersCount--;
 					printMatrix(matrix, size);
+				}
+				else {
+					cout << "Cannot place unit there it overlaps. ";
+					readOrientation(orientation);
+					readStartCoordinates(startX, startY, size);
 				}
 				break;
 			default:
