@@ -57,8 +57,8 @@ void promptUserToStartGame() {
 }
 
 void showGameStartMessage() {
-	const char gameStartedMessage[] = "Game started!";
-	cout << gameStartedMessage << endl << endl;
+	const char gameStartedMessage[] = "Game started!\n";
+	cout << gameStartedMessage << endl;
 }
 
 void freeMemoryMatrix(char** matrix, int size) {
@@ -185,7 +185,7 @@ bool placeUnit(char** matrix, int size, int x, int y, char orientation, ShipType
 	{
 		case Boat:
 			placeSymbols(matrix, unitLength, orientation, x, y, BOAT_CHAR);
-			break;
+			break;	
 		case Submarine:
 			placeSymbols(matrix, unitLength, orientation, x, y, SUBMARINE_CHAR);
 			break;
@@ -383,14 +383,19 @@ void playGame(char** firstPlayerMatrix, char** secondPlayerMatrix, int size) {
 	cout << (isGameOver(firstPlayerMatrix, size) ? "Player 2 Wins!" : "Player 1 Wins!") << endl;
 }
 
+void printInitialBoardsMessage() {
+	const char intitialBoardsMsg[] = "Initial Boards";
+	cout << intitialBoardsMsg << endl;
+}
+
 void startGame(char** firstPlayerMatrix, char** secondPlayerMatrix, int size) {
 	if (!firstPlayerMatrix || !secondPlayerMatrix)
 	{
 		return;
 	}
 
+	printInitialBoardsMessage();
 	// Show the board
-	cout << "Initial Boards:" << endl;
 	printBattlefiedlsSideBySide(firstPlayerMatrix, secondPlayerMatrix, size);
 
 	const bool IT_IS_FIRST_PLAYER = true;
@@ -428,7 +433,6 @@ void startGameEngine() {
 	promptUserToStartGame();
 
 	// Get the size of board
-	//TODO: validate that input is number
 	int size;
 	do {
 		size = readSizeOfMatrix();
@@ -436,7 +440,7 @@ void startGameEngine() {
 
 	showGameStartMessage();
 
-	// Initialize the board
+	// Initialize the boards
 	char** firstPlayerMatrix = new char* [size];
 	char** secondPlayerMatrix = new char* [size];
 	initializeMatrix(firstPlayerMatrix, size);
