@@ -213,14 +213,14 @@ void printBattlefieldsSideBySide(char** leftMatrix, char** rightMatrix, int size
 		for (int j = 0; j < size; j++) {
 			char current = leftMatrix[i][j];
 			if (hidden) {
-				if (current == WATER_CHAR) {
-					std::cout << " " << WATER_CHAR;
+				if (current == DESTROYED_CHAR) {
+					std::cout << " " << DESTROYED_CHAR;
 				}
 				else if (current == MISSED_CHAR) {
 					std::cout << " " << MISSED_CHAR;
 				}
 				else {
-					std::cout << " " << DESTROYED_CHAR;
+					std::cout << " " << WATER_CHAR;
 				}
 			}
 			else {
@@ -241,14 +241,14 @@ void printBattlefieldsSideBySide(char** leftMatrix, char** rightMatrix, int size
 		for (int j = 0; j < size; j++) {
 			char current = rightMatrix[i][j];
 			if (hidden) {
-				if (current == WATER_CHAR) {
-					std::cout << " " << WATER_CHAR;
+				if (current == DESTROYED_CHAR) {
+					std::cout << " " << DESTROYED_CHAR;
 				}
 				else if (current == MISSED_CHAR) {
 					std::cout << " " << MISSED_CHAR;
 				}
 				else {
-					std::cout << " " << DESTROYED_CHAR;
+					std::cout << " " << WATER_CHAR;
 				}
 			}
 			else {
@@ -374,17 +374,17 @@ void readStartCoordinates(int& startX, int& startY, int size) {
 	const char ENTER_Y[] = "Enter start y coordinate: ";
 	const char ENTER_Y_AGAIN[] = "Coordinate outside of board, enter start y coordinate again: ";
 
-	cout << ENTER_X;
+	cout << ENTER_X << endl;
 	readPositiveNumber(startX);
 	while (!checkCoordinateIsInside(startX, size)) {
-		cout << ENTER_X_AGAIN;
+		cout << ENTER_X_AGAIN << endl;
 		readPositiveNumber(startX);
 	}
 
-	cout << ENTER_Y;
+	cout << ENTER_Y << endl;
 	readPositiveNumber(startY);
 	while (!checkCoordinateIsInside(startY, size)) {
-		cout << ENTER_Y_AGAIN;
+		cout << ENTER_Y_AGAIN << endl;
 		readPositiveNumber(startY);
 	}
 }
@@ -444,6 +444,7 @@ void readUnits(int& boatsCount, int& submarinesCount, int& destroyersCount, int&
 void placeUnits(char** matrix, int size, bool isFirstPlayer, 
 	int boatsCount, int submarinesCount, int destroyersCount, int carriersCount) {
 	const char OVERLAPPING_UNIT[] = "Cannot place unit there it overlaps. ";
+	const char INSUFFICIENT_UNITS[] = "No units of the type are left. ";
 
 	if (!matrix) {
 		return;
@@ -458,7 +459,6 @@ void placeUnits(char** matrix, int size, bool isFirstPlayer,
 		char orientation = ' ';
 		readOrientation(orientation);
 
-		//TODO: validate if coordinates have been already shot
 		int startX = -1;
 		int startY = -1;
 		readStartCoordinates(startX, startY, size);
@@ -468,6 +468,16 @@ void placeUnits(char** matrix, int size, bool isFirstPlayer,
 		{
 			switch (unitType) {
 			case BOAT_CHAR:
+				if (boatsCount <= 0)
+				{
+					cout << INSUFFICIENT_UNITS;
+					readUnitType(unitType);
+					readOrientation(orientation);
+					readStartCoordinates(startX, startY, size);
+					continue;
+
+				}
+
 				if (placeUnit(matrix, size, startX, startY, orientation, ShipType::Boat)) {
 					unitWasPlaced = true;
 					boatsCount--;
@@ -480,6 +490,15 @@ void placeUnits(char** matrix, int size, bool isFirstPlayer,
 				}
 				break;
 			case SUBMARINE_CHAR:
+				if (submarinesCount <= 0)
+				{
+					cout << INSUFFICIENT_UNITS;
+					readUnitType(unitType);
+					readOrientation(orientation);
+					readStartCoordinates(startX, startY, size);
+					continue;
+				}
+
 				if (placeUnit(matrix, size, startX, startY, orientation, ShipType::Submarine)) {
 					unitWasPlaced = true;
 					submarinesCount--;
@@ -492,6 +511,15 @@ void placeUnits(char** matrix, int size, bool isFirstPlayer,
 				}
 				break;
 			case DESTROYER_CHAR:
+				if (destroyersCount <= 0)
+				{
+					cout << INSUFFICIENT_UNITS;
+					readUnitType(unitType);
+					readOrientation(orientation);
+					readStartCoordinates(startX, startY, size);
+					continue;
+				}
+
 				if (placeUnit(matrix, size, startX, startY, orientation, ShipType::Destroyer)) {
 					unitWasPlaced = true;
 					destroyersCount--;
@@ -504,6 +532,15 @@ void placeUnits(char** matrix, int size, bool isFirstPlayer,
 				}
 				break;
 			case CARRIER_CHAR:
+				if (carriersCount <= 0)
+				{
+					cout << INSUFFICIENT_UNITS;
+					readUnitType(unitType);
+					readOrientation(orientation);
+					readStartCoordinates(startX, startY, size);
+					continue;
+				}
+
 				if (placeUnit(matrix, size, startX, startY, orientation, ShipType::Carrier)) {
 					unitWasPlaced = true;
 					carriersCount--;
@@ -520,10 +557,6 @@ void placeUnits(char** matrix, int size, bool isFirstPlayer,
 			}
 		} while (!unitWasPlaced);
 	}
-}
-
-void readXAndYAttackCoordinates(int& x, int& y) {
-
 }
 
 void playerTurnAttack(char** defendingMatrix, int size) {
@@ -607,8 +640,9 @@ void playGame(char** firstPlayerMatrix, char** secondPlayerMatrix, int size) {
 
 	while (!isGameFinished) {
 		// Display the boards
-		/*cout << "Player 1's Board\t\t\tPlayer 2's Board" << endl;
-		printBattlefieldsSideBySide(firstPlayerMatrix, secondPlayerMatrix, size);*/
+		//cout << "Player 1's Board\t\t\tPlayer 2's Board" << endl;
+		cout << '\n';
+		printBattlefieldsSideBySide(firstPlayerMatrix, secondPlayerMatrix, size);
 
 		// Determine current player
 		// Player's turn
