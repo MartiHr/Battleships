@@ -111,12 +111,26 @@ void printMatrix(char** matrix, int size) {
 		return;
 	}
 
+	// Print column indices
+	std::cout << "   ";
+	for (int j = 0; j < size; j++) {
+		std::cout << " " << j;
+	}
+	std::cout << std::endl;
+
 	for (int i = 0; i < size; i++) {
+		// Print row index
+		if (i < 10) {
+			std::cout << i << " |";
+		}
+		else {
+			std::cout << i << "|";
+		}
 		for (int j = 0; j < size; j++) {
-			cout << matrix[i][j];
+			std::cout << " " << matrix[i][j];
 		}
 
-		cout << endl;
+		std::cout << std::endl;
 	}
 }
 
@@ -355,49 +369,85 @@ bool isOrientationValid(char orientation) {
 }
 
 void readStartCoordinates(int& startX, int& startY, int size) {
-	cout << "Enter start x coordinate : ";
+	const char ENTER_X[] = "Enter start x coordinate: ";
+	const char ENTER_X_AGAIN[] = "Coordinate outside of board, enter start x coordinate again: ";
+	const char ENTER_Y[] = "Enter start y coordinate: ";
+	const char ENTER_Y_AGAIN[] = "Coordinate outside of board, enter start y coordinate again: ";
+
+	cout << ENTER_X;
 	readPositiveNumber(startX);
 	while (!checkCoordinateIsInside(startX, size)) {
-		cout << "Coordinate outside of board, enter start x coordinate again : ";
+		cout << ENTER_X_AGAIN;
 		readPositiveNumber(startX);
 	}
 
-	cout << "Enter start y coordinate: ";
+	cout << ENTER_Y;
 	readPositiveNumber(startY);
 	while (!checkCoordinateIsInside(startY, size)) {
-		cout << "Coordinate outside of board, enter start y coordinate again : ";
+		cout << ENTER_Y_AGAIN;
 		readPositiveNumber(startY);
 	}
 }
 
 void readOrientation(char& orientation) {
-	cout << "Enter orientation (h for horizontal, v - for vertical): ";
+	const char ORIENTATION_MSG[] = "Enter orientation (h for horizontal, v - for vertical): ";
+	const char WRONG_ORIENTATION_MSG[] = "Wrong orientation input, enter orientation again (h for horizontal, v - for vertical): ";
+
+	cout << ORIENTATION_MSG;
 	cin >> orientation;
 	while (!isOrientationValid(orientation)) {
-		cout << "Wrong orientation input, enter orientation again (h for horizontal, v - for vertical) : ";
+		cout << WRONG_ORIENTATION_MSG;
 		cin >> orientation;
 	}
 }
 
 void readUnitType(char& unitType) {
-	cout << "Enter type of unit - b for (b)oat, (s)ubmarine, (d)estroyer, (c)arrier : ";
+	const char UNIT_TYPES[] = "Enter type of unit - b for (b)oat, (s)ubmarine, (d)estroyer, (c)arrier: ";
+	const char WRONG_UNIT_TYPES[] = "Wrong unit, enter type of unit - b for (b)oat, (s)ubmarine, (d)estroyer, (c)arrier again: ";
+
+	cout << UNIT_TYPES;
 	cin >> unitType;
-	while (unitType != BOAT_CHAR && unitType != SUBMARINE_CHAR && unitType != DESTROYER_CHAR && unitType != CARRIER_CHAR)
-	{
-		cout << "Wrong unit, enter type of unit - b for (b)oat, (s)ubmarine, (d)estroyer, (c)arrier again : ";
+	while (unitType != BOAT_CHAR && unitType != SUBMARINE_CHAR && unitType != DESTROYER_CHAR && unitType != CARRIER_CHAR) {
+		cout << WRONG_UNIT_TYPES;
 		cin >> unitType;
 	}
 }
 
-void placeUnits(char** matrix, int size, bool isFirstPlayer) {
+void readUnits(int& boatsCount, int& submarinesCount, int& destroyersCount, int& carriersCount, int size) {
+	const char UNIT_COUNTS[] = "Enter counts of units which would let them all be placed.";
+	const char BOATS_NUMBER[] = "Enter number of boats:";
+	const char SUBMARINES_NUMBER[] = "Enter number of submarines:";
+	const char DESTROYERS_NUMBER[] = "Enter number of destroyers:";
+	const char CARRIERS_NUMBER[] = "Enter number of carriers:";
+
+	int maxSum = size * size;
+	int sum;
+
+	do {
+		cout << UNIT_COUNTS << endl;
+		sum = 0;
+
+		cout << BOATS_NUMBER << endl;
+		readPositiveNumber(boatsCount);
+		cout << SUBMARINES_NUMBER << endl;
+		readPositiveNumber(submarinesCount);
+		cout << DESTROYERS_NUMBER << endl;
+		readPositiveNumber(destroyersCount);
+		cout << CARRIERS_NUMBER << endl;
+		readPositiveNumber(carriersCount);
+
+		sum = boatsCount * (int)Boat + submarinesCount * (int)Submarine + destroyersCount * (int)Destroyer + carriersCount * (int)Carrier;
+
+	} while (sum > maxSum || sum == 0);
+}
+
+void placeUnits(char** matrix, int size, bool isFirstPlayer, 
+	int boatsCount, int submarinesCount, int destroyersCount, int carriersCount) {
+	const char OVERLAPPING_UNIT[] = "Cannot place unit there it overlaps. ";
+
 	if (!matrix) {
 		return;
 	}
-
-	int boatsCount = 0;
-	int submarinesCount = 0;
-	int destroyersCount = 0;
-	int carriersCount = 0;
 
 	while (boatsCount != 0 || submarinesCount != 0 || destroyersCount != 0 || carriersCount != 0) {
 		showPlaceUnitsMessage(boatsCount, submarinesCount, destroyersCount, carriersCount, isFirstPlayer);
@@ -424,7 +474,7 @@ void placeUnits(char** matrix, int size, bool isFirstPlayer) {
 					printMatrix(matrix, size);
 				}
 				else {
-					cout << "Cannot place unit there it overlaps. ";
+					cout << OVERLAPPING_UNIT;
 					readOrientation(orientation);
 					readStartCoordinates(startX, startY, size);
 				}
@@ -436,7 +486,7 @@ void placeUnits(char** matrix, int size, bool isFirstPlayer) {
 					printMatrix(matrix, size);
 				}
 				else {
-					cout << "Cannot place unit there it overlaps. ";
+					cout << OVERLAPPING_UNIT;
 					readOrientation(orientation);
 					readStartCoordinates(startX, startY, size);
 				}
@@ -448,7 +498,7 @@ void placeUnits(char** matrix, int size, bool isFirstPlayer) {
 					printMatrix(matrix, size);
 				}
 				else {
-					cout << "Cannot place unit there it overlaps. ";
+					cout << OVERLAPPING_UNIT;
 					readOrientation(orientation);
 					readStartCoordinates(startX, startY, size);
 				}
@@ -460,7 +510,7 @@ void placeUnits(char** matrix, int size, bool isFirstPlayer) {
 					printMatrix(matrix, size);
 				}
 				else {
-					cout << "Cannot place unit there it overlaps. ";
+					cout << OVERLAPPING_UNIT;
 					readOrientation(orientation);
 					readStartCoordinates(startX, startY, size);
 				}
@@ -477,29 +527,45 @@ void readXAndYAttackCoordinates(int& x, int& y) {
 }
 
 void playerTurnAttack(char** defendingMatrix, int size) {
+	const char ENTER_ATTACK_COORDINATES[] = "Enter coordinates to attack (x, y):";
+	const char MISS[] = "Miss!";
+	const char WASTED_SHOT[] = "You wasted a shot!";
+	const char HIT[] = "Hit!";
+
+	if (!defendingMatrix)
+	{
+		return;
+	}
+
 	// Implement the logic for a player's turn
 	int x = 0;
 	int y = 0;
 
-	cout << "Enter coordinates to attack (x, y):" << endl;
+	cout << ENTER_ATTACK_COORDINATES << endl;
 	readPositiveNumber(x);
 	readPositiveNumber(y);
 
 	// Validate input
 	while (!checkCoordinateIsInside(x, size) || !checkCoordinateIsInside(y, size)) {
-		cout << "Invalid coordinates. Enter again: ";
-		cin >> x >> y;
+		cout << "Invalid coordinates: " << endl;
+		readPositiveNumber(x);
+		readPositiveNumber(y);
 	}
 
 	// Check the result of the attack
 	if (defendingMatrix[x][y] == WATER_CHAR) {
-		cout << "Miss!" << endl;
+		cout << MISS << endl;
 		defendingMatrix[x][y] = MISSED_CHAR;  // 'O' for miss
 	}
+	else if (defendingMatrix[x][y] == DESTROYED_CHAR) {
+		cout << WASTED_SHOT << endl;
+	}
 	else {
-		cout << "Hit!" << endl;
+		cout << HIT << endl;
 		defendingMatrix[x][y] = DESTROYED_CHAR;
 	}
+
+	//printBattlefieldsSideBySide(defendingMatrix, size);
 }
 
 bool isGameOver(char** matrix, int size) {
@@ -524,6 +590,13 @@ bool isGameOver(char** matrix, int size) {
 
 
 void playGame(char** firstPlayerMatrix, char** secondPlayerMatrix, int size) {
+	const char PLAYER_1_TURN[] = "Player 1's Turn";
+	const char PLAYER_2_TURN[] = "Player 2's Turn";
+	const char PLAYER_1_WIN[] = "Player 1 Wins!";
+	const char PLAYER_2_WIN[] = "Player 2 Wins!";
+	const char FINAL_BOARDS[] = "Final boards:";
+	const char GAME_OVER[] = "Game Over! ";
+
 	if (!firstPlayerMatrix || !secondPlayerMatrix)
 	{
 		return;
@@ -539,7 +612,7 @@ void playGame(char** firstPlayerMatrix, char** secondPlayerMatrix, int size) {
 
 		// Determine current player
 		// Player's turn
-		cout << (firstPlayerTurn ? "Player 1's Turn" : "Player 2's Turn") << endl;
+		cout << (firstPlayerTurn ? PLAYER_1_TURN : PLAYER_2_TURN) << endl;
 		if (firstPlayerTurn) {
 			playerTurnAttack(secondPlayerMatrix, size);
 		}
@@ -555,17 +628,17 @@ void playGame(char** firstPlayerMatrix, char** secondPlayerMatrix, int size) {
 	}
 
 	// Display the final boards
-	cout << "Final boards:" << endl;
+	cout << FINAL_BOARDS << endl;
 	printBattlefieldsSideBySide(firstPlayerMatrix, secondPlayerMatrix, size, false);
 
 	// Display the winner
-	cout << "Game Over! ";
-	cout << (isGameOver(firstPlayerMatrix, size) ? "Player 2 Wins!" : "Player 1 Wins!") << endl;
+	cout << GAME_OVER;
+	cout << (isGameOver(firstPlayerMatrix, size) ? PLAYER_2_WIN : PLAYER_1_WIN) << endl;
 }
 
 void printInitialBoardsMessage() {
-	const char intitialBoardsMsg[] = "Initial Boards";
-	cout << intitialBoardsMsg << endl;
+	const char INITIAL_BOARDS_MSG[] = "Initial Boards";
+	cout << INITIAL_BOARDS_MSG << endl;
 }
 
 void printSpacingToHidePlayerMoves() {
@@ -589,14 +662,23 @@ void startGame(char** firstPlayerMatrix, char** secondPlayerMatrix, int size) {
 	printBattlefieldsSideBySide(firstPlayerMatrix, secondPlayerMatrix, size);
 
 	const bool IT_IS_FIRST_PLAYER = true;
+
+	// Read units (if more units are given the logic should be encapsulated in an array)
+	int boatsCount = 0;
+	int submarinesCount = 0;
+	int destroyersCount = 0;
+	int carriersCount = 0;
+
+	readUnits(boatsCount, submarinesCount, destroyersCount, carriersCount, size);
+
 	// Place units for first player
-	placeUnits(firstPlayerMatrix, size, IT_IS_FIRST_PLAYER);
+	placeUnits(firstPlayerMatrix, size, IT_IS_FIRST_PLAYER, boatsCount, submarinesCount, destroyersCount, carriersCount);
 
 	// (Optional)
 	//printSpacingToHidePlayerMoves();
 
 	// Place units for second player
-	placeUnits(secondPlayerMatrix, size, !IT_IS_FIRST_PLAYER);
+	placeUnits(secondPlayerMatrix, size, !IT_IS_FIRST_PLAYER, boatsCount, submarinesCount, destroyersCount, carriersCount);
 
 	// Start the turns
 	playGame(firstPlayerMatrix, secondPlayerMatrix, size);
