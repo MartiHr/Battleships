@@ -23,7 +23,7 @@ const char HORIZONTAL_ORIENTATION = 'h';
 const char VERTICAL_ORIENTATION = 'v';
 
 void showLoadingScreen() {
-	std::cout <<
+	cout <<
 		"                                     # #  ( )\n"
 		"                                  ___#_#___|__\n"
 		"                              _  |____________|  _\n"
@@ -46,7 +46,6 @@ void showLoadingScreen() {
 		"\n";
 }
 
-
 void printWrongInputMessage() {
 	cout << "" << endl;
 }
@@ -56,7 +55,7 @@ void promptUserToStartGame() {
 }
 
 void showGameStartMessage() {
-	cout << "Game started!" << endl;
+	cout << "Game started!" << endl << endl;
 }
 
 void freeMemoryMatrix(char** matrix, int size) {
@@ -72,8 +71,22 @@ void freeMemoryMatrix(char** matrix, int size) {
 }
 
 int readSizeOfMatrix() {
-	int size = 0;
-	cin >> size;
+	int size;
+	while (true) {
+		if (std::cin >> size) {
+			if (size > 0) {
+				break;
+			}
+			else {
+				std::cout << "Please enter a positive number.\n";
+			}
+		}
+		else {
+			std::cin.clear(); // Clear the fail state
+			std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Discard invalid input
+			cout << "Invalid input. Please enter a number : ";
+		}
+	}
 	return size;
 }
 
@@ -387,6 +400,21 @@ void startGame(char** firstPlayerMatrix, char** secondPlayerMatrix, int size) {
 	playGame(firstPlayerMatrix, secondPlayerMatrix, size);
 }
 
+bool isSizeValid(int size) {
+	const int MIN_SIZE = 3;
+	const int MAX_SIZE = 50;
+
+	if (size >= MIN_SIZE && size <= MAX_SIZE) {
+		return true;
+	}
+	else {
+		std::cout << "Invalid size. Size must be a number between " << MIN_SIZE << " and " << MAX_SIZE << ". Try again: ";
+		return false;
+	}
+
+	return true;
+}
+
 void startGameEngine() {
 	showLoadingScreen();
 
@@ -395,7 +423,11 @@ void startGameEngine() {
 
 	// Get the size of board
 	//TODO: validate that input is number
-	int size = readSizeOfMatrix();
+	int size;
+	do {
+		size = readSizeOfMatrix();
+	} while (!isSizeValid(size));
+
 	showGameStartMessage();
 
 	// Initialize the board
@@ -414,4 +446,5 @@ void startGameEngine() {
 int main()
 {
 	startGameEngine();
+	return 0;
 }
