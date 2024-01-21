@@ -53,7 +53,8 @@ void printWrongInputMessage() {
 }
 
 void promptUserToStartGame() {
-	cout << "Please enter the size for the game " << "["<< MIN_SIZE << ", " << MAX_SIZE << "]" << " fields and press ENTER to start: ";
+	cout << "Please enter the size for the game " << "["<< MIN_SIZE << ", " << MAX_SIZE << "]" 
+		<< " fields and press ENTER to start: ";
 }
 
 void showGameStartMessage() {
@@ -97,8 +98,7 @@ int readSizeOfMatrix() {
 }
 
 void printMatrix(char** matrix, int size) {
-	if (!matrix)
-	{
+	if (!matrix) {
 		return;
 	}
 
@@ -116,12 +116,10 @@ void initializeMatrix(char** matrix, int size) {
 		return;
 	}
 
-	for (int i = 0; i < size; i++)
-	{
+	for (int i = 0; i < size; i++) {
 		matrix[i] = new char[size];
 
-		for (int j = 0; j < size; j++)
-		{
+		for (int j = 0; j < size; j++) {
 			matrix[i][j] = WATER_CHAR;
 		}
 	}
@@ -132,19 +130,15 @@ void printBattlefiedlsSideBySide(char** leftMatrix, char** rightMatrix, int size
 		return;
 	}
 
-	for (int i = 0; i < size; i++)
-	{
-
-		for (int j = 0; j < size; j++)
-		{
+	for (int i = 0; i < size; i++) {
+		for (int j = 0; j < size; j++) {
 			cout << leftMatrix[i][j];
 		}
 
-		// Print a tabular
+		// Print spacing
 		cout << "\t\t\t\t\t";
 
-		for (int j = 0; j < size; j++)
-		{
+		for (int j = 0; j < size; j++) {
 			cout << rightMatrix[i][j];
 		}
 
@@ -156,9 +150,21 @@ bool checkCoordinateIsInside(int coordinate, int size) {
 	return (coordinate >= 0 && coordinate < size);
 }
 
-void placeSymbols(char** matrix, int unitLength, char orientation, int x, int y, char placeSymbol) {
+bool placeSymbols(char** matrix, int unitLength, char orientation, int x, int y, char placeSymbol) {
+	if (!matrix)
+	{
+		return false;
+	}
+
 	if (orientation == VERTICAL_ORIENTATION) {
 		int lastXCoordinate = unitLength + x;
+
+		// Check if placement is possible
+		for (int i = x; i < lastXCoordinate; i++) {
+			if (matrix[i][y] != WATER_CHAR) {
+				return false;
+			}
+		}
 
 		for (int i = x; i < lastXCoordinate; i++) {
 			matrix[i][y] = placeSymbol;
@@ -167,10 +173,48 @@ void placeSymbols(char** matrix, int unitLength, char orientation, int x, int y,
 	else if (orientation == HORIZONTAL_ORIENTATION) {
 		int lastYCoordinate = unitLength + y;
 
+		// Check if placement is possible
+		for (int i = y; i < lastYCoordinate; i++) {
+			if (matrix[x][i] != WATER_CHAR) {
+				return false;
+			}
+		}
+
 		for (int i = y; i < lastYCoordinate; i++) {
 			matrix[x][i] = placeSymbol;
 		}
 	}
+
+	return true;
+}
+
+bool checkOverlap(char** matrix, int unitLength, char orientation, int x, int y) {
+	if (!matrix) {
+		return false;
+	}
+
+	if (orientation == VERTICAL_ORIENTATION) {
+		int lastXCoordinate = unitLength + x;
+
+		// Check if placement is possible
+		for (int i = x; i < lastXCoordinate; i++) {
+			if (matrix[i][y] != WATER_CHAR) {
+				return false;
+			}
+		}
+	}
+	else if (orientation == HORIZONTAL_ORIENTATION) {
+		int lastYCoordinate = unitLength + y;
+
+		// Check if placement is possible
+		for (int i = y; i < lastYCoordinate; i++) {
+			if (matrix[x][i] != WATER_CHAR) {
+				return false;
+			}
+		}
+	}
+
+	return true;
 }
 
 // return a boolean and validate coordinates inside
@@ -180,6 +224,12 @@ bool placeUnit(char** matrix, int size, int x, int y, char orientation, ShipType
 	}
 
 	int unitLength = (int)unitType;
+
+	// Check for overlapping
+	if (unitType != Destroyed && checkOverlap(matrix, unitLength, orientation, x, y))
+	{
+		return false;
+	}
 
 	switch (unitType)
 	{
@@ -202,7 +252,7 @@ bool placeUnit(char** matrix, int size, int x, int y, char orientation, ShipType
 			break;
 	}
 
-	return true;
+	return false;
 }
 
 void showPlaceUnitsMessage(int boatsCount, int submarinesCount, int destroyersCount, int carriersCount, bool isFirstPlayer) {
@@ -224,7 +274,7 @@ void placeUnits(char** matrix, int size, bool isFirstPlayer) {
 		return;
 	}
 
-	int boatsCount = 1;
+	int boatsCount = 2;
 	int submarinesCount = 0;
 	int destroyersCount = 0;
 	int carriersCount = 0;
@@ -266,36 +316,40 @@ void placeUnits(char** matrix, int size, bool isFirstPlayer) {
 			cin >> startY;
 		}
 
-		switch (unitType) {
-		case BOAT_CHAR:
-			if (placeUnit(matrix, size, startX, startY, orientation, ShipType::Boat)) {
-				boatsCount--;
-				printMatrix(matrix, size);
+		bool unitWasPlaced = false;
+
+		do
+		{
+			switch (unitType) {
+			case BOAT_CHAR:
+				if (placeUnit(matrix, size, startX, startY, orientation, ShipType::Boat)) {
+					unitWasPlaced = true;
+					boatsCount--;
+					printMatrix(matrix, size);
+				}
+				break;
+			case SUBMARINE_CHAR:
+				if (placeUnit(matrix, size, startX, startY, orientation, ShipType::Submarine)) {
+					submarinesCount--;
+					printMatrix(matrix, size);
+				}
+				break;
+			case DESTROYER_CHAR:
+				if (placeUnit(matrix, size, startX, startY, orientation, ShipType::Destroyer)) {
+					destroyersCount--;
+					printMatrix(matrix, size);
+				}
+				break;
+			case CARRIER_CHAR:
+				if (placeUnit(matrix, size, startX, startY, orientation, ShipType::Carrier)) {
+					carriersCount--;
+					printMatrix(matrix, size);
+				}
+				break;
+			default:
+				break;
 			}
-			break;
-		case SUBMARINE_CHAR:
-			if (placeUnit(matrix, size, startX, startY, orientation, ShipType::Submarine))
-			{
-				submarinesCount--;
-				printMatrix(matrix, size);
-			}
-			break;
-		case DESTROYER_CHAR:
-			if (placeUnit(matrix, size, startX, startY, orientation, ShipType::Destroyer)) {
-				destroyersCount--;
-				printMatrix(matrix, size);
-			}
-			break;
-		case CARRIER_CHAR:
-			if (placeUnit(matrix, size, startX, startY, orientation, ShipType::Carrier))
-			{
-				carriersCount--;
-				printMatrix(matrix, size);
-			}
-			break;
-		default:
-			break;
-		}
+		} while (!unitWasPlaced);
 	}
 }
 
@@ -388,6 +442,16 @@ void printInitialBoardsMessage() {
 	cout << intitialBoardsMsg << endl;
 }
 
+void printSpacingToHidePlayerMoves() {
+	const int SPACING_SIZE = 10;
+
+	for (int i = 0; i < SPACING_SIZE; i++) {
+		cout << '\n';
+	}
+
+	cout << endl;
+}
+
 void startGame(char** firstPlayerMatrix, char** secondPlayerMatrix, int size) {
 	if (!firstPlayerMatrix || !secondPlayerMatrix)
 	{
@@ -401,6 +465,8 @@ void startGame(char** firstPlayerMatrix, char** secondPlayerMatrix, int size) {
 	const bool IT_IS_FIRST_PLAYER = true;
 	// Place units for first player
 	placeUnits(firstPlayerMatrix, size, IT_IS_FIRST_PLAYER);
+
+	printSpacingToHidePlayerMoves();
 
 	// Place units for second player
 	placeUnits(secondPlayerMatrix, size, !IT_IS_FIRST_PLAYER);
