@@ -74,15 +74,17 @@ void freeMemoryMatrix(char** matrix, int size) {
 	delete[] matrix;
 }
 
-int readSizeOfMatrix() {
+void readPositiveNumber(int& number) {
 	const char POSITIVE_NUMBER_MESSAGE[] = "Please enter a positive number.\n";
 	const char INVALID_INPUT_MESSAGE[] = "Invalid input. Please enter a number : ";
 
-	int size;
-	while (true) {
-		if (std::cin >> size) {
-			if (size > 0) {
-				break;
+	bool validInput = false;
+	while (!validInput) {
+		std::cout << "Enter the size of the board: ";
+
+		if (std::cin >> number) {
+			if (number > 0) {
+				validInput = true;
 			}
 			else {
 				std::cout << POSITIVE_NUMBER_MESSAGE;
@@ -91,9 +93,18 @@ int readSizeOfMatrix() {
 		else {
 			std::cin.clear(); // Clear the fail state
 			std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Discard invalid input
-			cout << INVALID_INPUT_MESSAGE;
+			std::cout << INVALID_INPUT_MESSAGE;
 		}
 	}
+}
+
+int readSizeOfMatrix() {
+	const char POSITIVE_NUMBER_MESSAGE[] = "Please enter a positive number.\n";
+	const char INVALID_INPUT_MESSAGE[] = "Invalid input. Please enter a number : ";
+
+	int size;
+	readPositiveNumber(size);
+
 	return size;
 }
 
@@ -125,21 +136,45 @@ void initializeMatrix(char** matrix, int size) {
 	}
 }
 
-void printBattlefiedlsSideBySide(char** leftMatrix, char** rightMatrix, int size) {
+
+void printBattlefiedlsSideBySide(char** leftMatrix, char** rightMatrix, int size, bool hidden = true) {
 	if (!leftMatrix || !rightMatrix) {
 		return;
 	}
 
+	//TODO: extract copy logic in function
 	for (int i = 0; i < size; i++) {
 		for (int j = 0; j < size; j++) {
-			cout << leftMatrix[i][j];
+			char current = leftMatrix[i][j];
+			if (hidden) {
+				if (current != DESTROYED_CHAR) {
+					cout << WATER_CHAR;
+				}
+				else {
+					cout << DESTROYED_CHAR;
+				}
+			}
+			else {
+				cout << current;
+			}
 		}
 
 		// Print spacing
 		cout << "\t\t\t\t\t";
 
 		for (int j = 0; j < size; j++) {
-			cout << rightMatrix[i][j];
+			char current = leftMatrix[i][j];
+			if (hidden) {
+				if (current != DESTROYED_CHAR) {
+					cout << WATER_CHAR;
+				}
+				else {
+					cout << DESTROYED_CHAR;
+				}
+			}
+			else {
+				cout << current;
+			}
 		}
 
 		cout << endl;
@@ -256,17 +291,17 @@ bool isOrientationValid(char orientation) {
 
 void readStartCoordinates(int& startX, int& startY, int size) {
 	cout << "Enter start x coordinate : ";
-	cin >> startX;
+	readPositiveNumber(startX);
 	while (!checkCoordinateIsInside(startX, size)) {
 		cout << "Coordinate outside of board, enter start x coordinate again : ";
-		cin >> startX;
+		readPositiveNumber(startX);
 	}
 
 	cout << "Enter start y coordinate: ";
-	cin >> startY;
+	readPositiveNumber(startY);
 	while (!checkCoordinateIsInside(startY, size)) {
 		cout << "Coordinate outside of board, enter start y coordinate again : ";
-		cin >> startY;
+		readPositiveNumber(startY);
 	}
 }
 
@@ -279,7 +314,7 @@ void readOrientation(char& orientation) {
 	}
 }
 
-void readUnitType(char unitType) {
+void readUnitType(char& unitType) {
 	cout << "Enter type of unit - b for (b)oat, (s)ubmarine, (d)estroyer, (c)arrier : ";
 	cin >> unitType;
 	while (unitType != BOAT_CHAR && unitType != SUBMARINE_CHAR && unitType != DESTROYER_CHAR && unitType != CARRIER_CHAR)
@@ -314,7 +349,6 @@ void placeUnits(char** matrix, int size, bool isFirstPlayer) {
 		readStartCoordinates(startX, startY, size);
 
 		bool unitWasPlaced = false;
-
 		do
 		{
 			switch (unitType) {
@@ -373,9 +407,15 @@ void placeUnits(char** matrix, int size, bool isFirstPlayer) {
 	}
 }
 
-void playerTurnAttack(char** attackingMatrix, char** defendingMatrix, int size) {
+void readXAndYAttackCoordinates(int& x, int& y) {
+
+}
+
+void playerTurnAttack(char** defendingMatrix, int size) {
 	// Implement the logic for a player's turn
-	int x, y;
+	int x = 0;
+	int y = 0;
+
 	cout << "Enter coordinates to attack (x y): ";
 	cin >> x >> y;
 
@@ -435,10 +475,10 @@ void playGame(char** firstPlayerMatrix, char** secondPlayerMatrix, int size) {
 		// Player's turn
 		cout << (firstPlayerTurn ? "Player 1's Turn" : "Player 2's Turn") << endl;
 		if (firstPlayerTurn) {
-			playerTurnAttack(firstPlayerMatrix, secondPlayerMatrix, size);
+			playerTurnAttack(secondPlayerMatrix, size);
 		}
 		else {
-			playerTurnAttack(secondPlayerMatrix, firstPlayerMatrix, size);
+			playerTurnAttack(firstPlayerMatrix, size);
 		}
 
 		// Check if the game is over
@@ -499,8 +539,6 @@ void startGame(char** firstPlayerMatrix, char** secondPlayerMatrix, int size) {
 }
 
 bool isSizeValid(int size) {
-	
-
 	if (size >= MIN_SIZE && size <= MAX_SIZE) {
 		return true;
 	}
