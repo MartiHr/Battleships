@@ -53,8 +53,8 @@ void printWrongInputMessage() {
 }
 
 void promptUserToStartGame() {
-	cout << "Please enter the size for the game " << "["<< MIN_SIZE << ", " << MAX_SIZE << "]" 
-		<< " fields and press ENTER to start: ";
+	cout << "Please enter the size " << "[" << MIN_SIZE << ", " << MAX_SIZE << "]" 
+		<< " for the game fields and press ENTER to start: ";
 }
 
 void showGameStartMessage() {
@@ -75,15 +75,15 @@ void freeMemoryMatrix(char** matrix, int size) {
 }
 
 void readPositiveNumber(int& number) {
-	const char POSITIVE_NUMBER_MESSAGE[] = "Please enter a positive number.\n";
+	const char POSITIVE_NUMBER_MESSAGE[] = "Please enter a non-negative number: ";
 	const char INVALID_INPUT_MESSAGE[] = "Invalid input. Please enter a number : ";
 
 	bool validInput = false;
 	while (!validInput) {
-		std::cout << "Enter the size of the board: ";
+		//std::cout << "Enter the size of the board: ";
 
 		if (std::cin >> number) {
-			if (number > 0) {
+			if (number >= 0) {
 				validInput = true;
 			}
 			else {
@@ -99,7 +99,7 @@ void readPositiveNumber(int& number) {
 }
 
 int readSizeOfMatrix() {
-	const char POSITIVE_NUMBER_MESSAGE[] = "Please enter a positive number.\n";
+	const char POSITIVE_NUMBER_MESSAGE[] = "Please enter a positive number: \n";
 	const char INVALID_INPUT_MESSAGE[] = "Invalid input. Please enter a number : ";
 
 	int size;
@@ -136,48 +136,106 @@ void initializeMatrix(char** matrix, int size) {
 	}
 }
 
+// Is arguably worse
+//void printBattlefieldInnerCheckings(char** leftMatrix, int i, int size, bool hidden) {
+//	for (int j = 0; j < size; j++) {
+//		char current = leftMatrix[i][j];
+//		if (hidden) {
+//			if (current == WATER_CHAR) {
+//				cout << WATER_CHAR;
+//			}
+//			else if (current == MISSED_CHAR) {
+//				cout << MISSED_CHAR;
+//			}
+//			else {
+//				cout << DESTROYED_CHAR;
+//			}
+//		}
+//		else {
+//			cout << current;
+//		}
+//	}
+//}
+
+void printColumnIndices(int size) {
+	// Print column indices for the left matrix
+	std::cout << "   ";
+	for (int j = 0; j < size; j++) {
+		std::cout << " " << j;
+	}
+
+	// Print spacing between matrices
+	std::cout << "\t\t\t\t\t";
+
+	// Print column indices for the right matrix
+	std::cout << "   ";
+	for (int j = 0; j < size; j++) {
+		std::cout << " " << j;
+	}
+
+	std::cout << std::endl;
+}
 
 void printBattlefiedlsSideBySide(char** leftMatrix, char** rightMatrix, int size, bool hidden = true) {
 	if (!leftMatrix || !rightMatrix) {
 		return;
 	}
 
-	//TODO: extract copy logic in function
+	printColumnIndices(size);
+
+	// Print the matrices with row indices
 	for (int i = 0; i < size; i++) {
+		// Print row index
+		std::cout << i << " |";
+
+		// Print left matrix
 		for (int j = 0; j < size; j++) {
 			char current = leftMatrix[i][j];
 			if (hidden) {
-				if (current != DESTROYED_CHAR) {
-					cout << WATER_CHAR;
+				if (current == WATER_CHAR) {
+					std::cout << " " << WATER_CHAR;
+				}
+				else if (current == MISSED_CHAR) {
+					std::cout << " " << MISSED_CHAR;
 				}
 				else {
-					cout << DESTROYED_CHAR;
+					std::cout << " " << DESTROYED_CHAR;
 				}
 			}
 			else {
-				cout << current;
+				std::cout << " " << current;
 			}
 		}
 
 		// Print spacing
-		cout << "\t\t\t\t\t";
+		std::cout << "\t\t\t\t\t";
 
+		if (i < 10) {
+			std::cout << i << " |";
+		}
+		else {
+			std::cout << i << "|";
+		}
+		// Print right matrix
 		for (int j = 0; j < size; j++) {
-			char current = leftMatrix[i][j];
+			char current = rightMatrix[i][j];
 			if (hidden) {
-				if (current != DESTROYED_CHAR) {
-					cout << WATER_CHAR;
+				if (current == WATER_CHAR) {
+					std::cout << " " << WATER_CHAR;
+				}
+				else if (current == MISSED_CHAR) {
+					std::cout << " " << MISSED_CHAR;
 				}
 				else {
-					cout << DESTROYED_CHAR;
+					std::cout << " " << DESTROYED_CHAR;
 				}
 			}
 			else {
-				cout << current;
+				std::cout << " " << current;
 			}
 		}
 
-		cout << endl;
+		std::cout << std::endl;
 	}
 }
 
@@ -215,7 +273,7 @@ bool checkOverlap(char** matrix, int unitLength, char orientation, int x, int y)
 	}
 
 	if (orientation == VERTICAL_ORIENTATION) {
-		int lastXCoordinate = unitLength + x;
+		int lastXCoordinate = unitLength + x;	
 
 		// Check if placement is possible
 		for (int i = x; i < lastXCoordinate; i++) {
@@ -329,7 +387,7 @@ void placeUnits(char** matrix, int size, bool isFirstPlayer) {
 		return;
 	}
 
-	int boatsCount = 2;
+	int boatsCount = 0;
 	int submarinesCount = 0;
 	int destroyersCount = 0;
 	int carriersCount = 0;
@@ -416,8 +474,9 @@ void playerTurnAttack(char** defendingMatrix, int size) {
 	int x = 0;
 	int y = 0;
 
-	cout << "Enter coordinates to attack (x y): ";
-	cin >> x >> y;
+	cout << "Enter coordinates to attack (x, y):" << endl;
+	readPositiveNumber(x);
+	readPositiveNumber(y);
 
 	// Validate input
 	while (!checkCoordinateIsInside(x, size) || !checkCoordinateIsInside(y, size)) {
@@ -490,7 +549,7 @@ void playGame(char** firstPlayerMatrix, char** secondPlayerMatrix, int size) {
 
 	// Display the final boards
 	cout << "Player 1's Board\t\t\tPlayer 2's Board" << endl;
-	printBattlefiedlsSideBySide(firstPlayerMatrix, secondPlayerMatrix, size);
+	printBattlefiedlsSideBySide(firstPlayerMatrix, secondPlayerMatrix, size, false);
 
 	// Display the winner
 	cout << "Game Over! ";
