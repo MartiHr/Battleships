@@ -12,6 +12,8 @@ enum ShipType {
 
 const char placeUnitsMeesage[] = "";
 
+const int MIN_SIZE = 3;
+const int MAX_SIZE = 50;
 const char WATER_CHAR = '~';
 const char BOAT_CHAR = 'b';
 const char SUBMARINE_CHAR = 's';
@@ -51,11 +53,12 @@ void printWrongInputMessage() {
 }
 
 void promptUserToStartGame() {
-	cout << "Please enter the size for the game fields and press ENTER to start: ";
+	cout << "Please enter the size for the game " << "["<< MIN_SIZE << ", " << MAX_SIZE << "]" << " fields and press ENTER to start: ";
 }
 
 void showGameStartMessage() {
-	cout << "Game started!" << endl << endl;
+	const char gameStartedMessage[] = "Game started!";
+	cout << gameStartedMessage << endl << endl;
 }
 
 void freeMemoryMatrix(char** matrix, int size) {
@@ -71,6 +74,9 @@ void freeMemoryMatrix(char** matrix, int size) {
 }
 
 int readSizeOfMatrix() {
+	const char POSITIVE_NUMBER_MESSAGE[] = "Please enter a positive number.\n";
+	const char INVALID_INPUT_MESSAGE[] = "Invalid input. Please enter a number : ";
+
 	int size;
 	while (true) {
 		if (std::cin >> size) {
@@ -78,13 +84,13 @@ int readSizeOfMatrix() {
 				break;
 			}
 			else {
-				std::cout << "Please enter a positive number.\n";
+				std::cout << POSITIVE_NUMBER_MESSAGE;
 			}
 		}
 		else {
 			std::cin.clear(); // Clear the fail state
 			std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Discard invalid input
-			cout << "Invalid input. Please enter a number : ";
+			cout << INVALID_INPUT_MESSAGE;
 		}
 	}
 	return size;
@@ -179,6 +185,7 @@ bool placeUnit(char** matrix, int size, int x, int y, char orientation, ShipType
 	{
 		case Boat:
 			placeSymbols(matrix, unitLength, orientation, x, y, BOAT_CHAR);
+			break;
 		case Submarine:
 			placeSymbols(matrix, unitLength, orientation, x, y, SUBMARINE_CHAR);
 			break;
@@ -401,8 +408,7 @@ void startGame(char** firstPlayerMatrix, char** secondPlayerMatrix, int size) {
 }
 
 bool isSizeValid(int size) {
-	const int MIN_SIZE = 3;
-	const int MAX_SIZE = 50;
+	
 
 	if (size >= MIN_SIZE && size <= MAX_SIZE) {
 		return true;
