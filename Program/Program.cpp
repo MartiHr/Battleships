@@ -47,6 +47,31 @@ void showLoadingScreen() {
 
 }
 
+void showLoadingScreen() {
+	std::cout <<
+		"                                     # #  ( )\n"
+		"                                  ___#_#___|__\n"
+		"                              _  |____________|  _\n"
+		"                       _=====| | |            | | |==== _\n"
+		"                 =====| |.---------------------------. | |====\n"
+		"   <--------------------'   .  .  .  .  .  .  .  .   '--------------/\n"
+		"    \\                                                             /\n"
+		"     \\___________________________________________________________/\n"
+		"  wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww\n"
+		"wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww\n"
+		"wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww\n"
+    "          _           _   _   _           _     _         \n"
+    "         | |         | | | | | |         | |   (_)        \n"
+    "         | |__   __ _| |_| |_| | ___  ___| |__  _ _ __   ___  \n"
+    "         | '_ \\ / _` | __| __| |/ _ \\/ __| '_ \\| | '_ \\ / __|  \n"
+    "         | |_) | (_| | |_| |_| |  __/\\__ \\ | | | | |_) |\\__ \\ \n"
+    "         |_.__/ \\__,_|\\__|\\__|_|\\___||___/_| |_|_| .__/ |___/ \n"
+    "                                                 | |         \n"
+    "                                                 |_|         \n"
+		"\n";
+}
+
+
 void printWrongInputMessage() {
 	cout << "" << endl;
 }
