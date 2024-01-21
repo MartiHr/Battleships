@@ -55,3 +55,10 @@ ipch/
 *.db
 .vs/Battleships/v17/.suo
 *.db-wal
+.vs/Battleships/v17/.suo
+*.recipe
+*.ilk
+*.tlog
+*.pdb
+*.tlog
+*.tlog
